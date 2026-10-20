@@ -1,107 +1,109 @@
-# Cài đặt & chạy project trên Windows
+# Cài đặt & chạy project trên Windows (không dùng Docker)
 
-Project này chạy Laravel (`api/`) qua Docker (Laravel Sail) — **không cần cài PHP/Composer/MySQL trực tiếp lên Windows**, chỉ cần Docker. MySQL cũng chạy trong container, bạn kết nối vào nó từ các tool Windows bình thường (HeidiSQL, TablePlus, DBeaver, MySQL Workbench...) qua `localhost:3306`.
+Cách này cài PHP, Composer, MySQL **trực tiếp lên Windows**, không qua Docker.
 
-## 1. Cài Docker Desktop (bắt buộc)
+## 1. Cài Laragon (khuyên dùng — có sẵn PHP + MySQL + Composer)
 
-1. Tải và cài **Docker Desktop for Windows**: https://www.docker.com/products/docker-desktop/
-2. Khi cài, chọn dùng **WSL 2 backend** (mặc định ở bản mới). Nếu máy chưa có WSL2, Docker Desktop sẽ tự nhắc cài — đồng ý theo hướng dẫn, có thể cần khởi động lại máy.
-3. Mở Docker Desktop, đợi nó chạy xong (icon cá voi ở khay hệ thống chuyển sang trạng thái "running").
-4. Kiểm tra trong **PowerShell**:
-   ```powershell
-   docker --version
-   docker compose version
+[Laragon](https://laragon.org/download/) là công cụ phổ biến cho dev PHP trên Windows, cài 1 lần có đủ PHP, MySQL, Composer, Apache/Nginx, không cần cấu hình gì thêm.
+
+1. Tải **Laragon Full** (bản Full đã kèm sẵn PHP/MySQL/Composer): https://laragon.org/download/
+2. Cài đặt (Next liên tục là xong).
+3. Mở Laragon, bấm **Start All** — nó sẽ bật Apache/Nginx + MySQL.
+4. Kiểm tra PHP/Composer có sẵn: mở **Laragon → Terminal** (hoặc "Cmder" trong menu Laragon), gõ:
+   ```
+   php -v
+   composer -V
    ```
 
-## 2. Cài WSL2 + Ubuntu (khuyến nghị, để code chạy nhanh)
+> Nếu không muốn dùng Laragon, có thể cài riêng lẻ: PHP tại https://windows.php.net/download/ (bản Thread Safe, >= 8.2), Composer tại https://getcomposer.org/download/, MySQL tại https://dev.mysql.com/downloads/installer/. Phần hướng dẫn bên dưới vẫn áp dụng, chỉ khác bước khởi động MySQL/PHP.
 
-Chạy Sail từ ổ đĩa Windows (`C:\...`) hoạt động được nhưng **chậm hơn đáng kể** so với chạy trong WSL2. Nên clone code vào trong WSL2:
+## 2. Lấy code về
 
-```powershell
-wsl --install -d Ubuntu
-```
-
-Sau khi cài xong, mở app **Ubuntu** từ Start Menu, tạo user/password Linux khi được hỏi. Từ đây, mọi lệnh bên dưới chạy **trong cửa sổ Ubuntu (WSL2)**, không phải PowerShell/CMD.
-
-Trong Docker Desktop: **Settings → Resources → WSL Integration**, bật toggle cho bản phân phối Ubuntu bạn vừa cài.
-
-## 3. Lấy code về
-
-Trong cửa sổ Ubuntu (WSL2):
+Mở **Laragon → Terminal**, hoặc Git Bash / PowerShell bình thường:
 
 ```bash
-cd ~
+cd C:\laragon\www
 git clone <url-repo-cua-ban> webbangiay
-cd webbangiay
+cd webbangiay\api
 ```
 
-(Nếu đã có code sẵn trên Windows, copy nguyên thư mục vào trong WSL2, ví dụ vào `~/webbangiay`, đừng để trong `/mnt/c/...` vì chạy chậm.)
+(Nếu dùng Laragon, để code trong `C:\laragon\www\` thì Laragon tự tạo domain kiểu `webbangiay.test` luôn, tiện hơn.)
 
-## 4. Chạy backend Laravel (api/)
+## 3. Cài dependency Laravel
 
 ```bash
-cd ~/webbangiay/api
-./vendor/bin/sail up -d
+composer install
+copy .env.example .env
+php artisan key:generate
 ```
 
-Lần đầu chạy sẽ hơi lâu vì Docker tải image. Khi xong:
+## 4. Tạo database MySQL
+
+Mở **Laragon → Menu → MySQL → HeidiSQL** (hoặc phpMyAdmin, hoặc bất kỳ tool GUI nào bạn quen: HeidiSQL/TablePlus/MySQL Workbench), kết nối:
+
+| Thông số | Giá trị mặc định Laragon |
+|---|---|
+| Host | `127.0.0.1` |
+| Port | `3306` |
+| User | `root` |
+| Password | *(để trống — Laragon mặc định không đặt password root)* |
+
+Tạo database mới tên `laravel` (hoặc tên tuỳ bạn, miễn khớp với `.env` ở bước sau).
+
+## 5. Cấu hình `.env` kết nối MySQL
+
+Mở file `api/.env`, sửa phần DB:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+(Nếu không dùng Laragon mà tự cài MySQL riêng, điền đúng user/password bạn đã đặt lúc cài MySQL.)
+
+## 6. Chạy migration + test
 
 ```bash
-./vendor/bin/sail artisan migrate
-./vendor/bin/sail artisan test   # kiểm tra mọi thứ chạy đúng
+php artisan migrate
+php artisan test
+```
+
+## 7. Chạy backend
+
+```bash
+php artisan serve
 ```
 
 API chạy ở: **http://localhost:8000**
 
-Các lệnh hay dùng:
-```bash
-./vendor/bin/sail up -d        # bật containers
-./vendor/bin/sail stop         # tắt containers
-./vendor/bin/sail artisan ...  # chạy lệnh artisan
-./vendor/bin/sail composer ... # chạy composer
-./vendor/bin/sail npm ...      # chạy npm (bên trong container, không dùng cho storefront/)
-```
+(Nếu dùng Laragon và để code trong `www\`, bạn cũng có thể truy cập qua domain tự động `http://webbangiay.test` mà không cần chạy `artisan serve` — Laragon tự cấu hình virtual host qua Apache/Nginx có sẵn. Dùng `artisan serve` vẫn đơn giản và chắc chắn hoạt động hơn nếu mới làm quen.)
 
-## 5. Kết nối MySQL từ Windows (HeidiSQL / TablePlus / DBeaver / Workbench...)
+## 8. Chạy frontend storefront (Vue)
 
-MySQL chạy trong container nhưng có mở cổng ra ngoài máy, nên dùng tool GUI quen thuộc trên Windows kết nối như MySQL bình thường:
-
-| Thông số | Giá trị |
-|---|---|
-| Host | `127.0.0.1` (hoặc `localhost`) |
-| Port | `3306` |
-| User | `sail` (hoặc `root`) |
-| Password | `password` |
-| Database | `laravel` |
-
-> Các giá trị này lấy từ `api/.env` (`DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`). Nếu bạn đổi trong `.env`, nhớ `./vendor/bin/sail artisan config:clear` rồi `./vendor/bin/sail up -d` lại.
-
-Nếu đang mở tool GUI **trên Windows** (không phải trong WSL2), vẫn dùng `127.0.0.1:3306` bình thường — Docker Desktop tự forward port từ WSL2 ra Windows.
-
-## 6. Chạy frontend storefront (Vue)
-
-Chạy **trực tiếp bằng Node**, không qua Docker:
+Cần cài **Node.js** (tải tại https://nodejs.org/, bản LTS), sau đó:
 
 ```bash
-cd ~/webbangiay/storefront
+cd ..\storefront
 npm install
 npm run dev
 ```
 
-Mặc định chạy ở `http://localhost:5180` (xem `storefront/vite.config.js` nếu cần đổi port — nhớ đổi khớp luôn trong `api/.env` ở `SANCTUM_STATEFUL_DOMAINS`/`FRONTEND_STOREFRONT_URL` và `api/config/cors.php`, rồi `sail artisan config:clear`).
+Mặc định chạy ở `http://localhost:5180`. Nếu port bị trùng, đổi trong `storefront/vite.config.js`, rồi sửa khớp lại trong `api/.env` (`SANCTUM_STATEFUL_DOMAINS`, `FRONTEND_STOREFRONT_URL`) và `api/config/cors.php` (`allowed_origins`), sau đó chạy `php artisan config:clear`.
 
-## 7. Thứ tự khởi động mỗi lần làm việc
+## 9. Thứ tự khởi động mỗi lần làm việc
 
-```bash
-cd ~/webbangiay/api && ./vendor/bin/sail up -d
-cd ~/webbangiay/storefront && npm run dev
-```
-
-Mở trình duyệt: `http://localhost:5180`.
+1. Mở Laragon, bấm **Start All** (bật MySQL).
+2. Trong `api/`: `php artisan serve`
+3. Trong `storefront/`: `npm run dev`
+4. Mở trình duyệt: `http://localhost:5180`
 
 ## Sự cố thường gặp
 
-- **Port 3306/8000/5180 đã bị chiếm**: đổi `FORWARD_DB_PORT`/`APP_PORT` trong `api/.env`, hoặc đổi `PORT` trong `storefront/vite.config.js` (nhớ cập nhật CORS/Sanctum tương ứng).
-- **Docker Desktop báo "WSL2 not installed"**: chạy `wsl --install` trong PowerShell (chạy với quyền Administrator), khởi động lại máy.
-- **Chạy `sail` rất chậm**: kiểm tra code có đang nằm trong `/mnt/c/...` không — nếu có, chuyển vào thư mục home của WSL2 (`~/`) thay vì ổ Windows.
-- **`./vendor/bin/sail` báo "permission denied"**: chạy `chmod +x vendor/bin/sail` trong thư mục `api/`.
+- **`php` hoặc `composer` không nhận lệnh**: PHP/Composer của Laragon chưa được thêm vào PATH — mở lại terminal từ trong Laragon (nó tự set PATH), hoặc tự thêm đường dẫn `C:\laragon\bin\php\php-x.x.x` vào biến môi trường PATH của Windows.
+- **`php artisan migrate` báo lỗi kết nối DB**: kiểm tra MySQL đã "Start" trong Laragon chưa, và `.env` đã đúng host/port/user/password/database chưa, rồi chạy `php artisan config:clear`.
+- **Thiếu extension PHP** (ví dụ lỗi "pdo_mysql" hoặc "mbstring"): Laragon → Menu → PHP → php.ini, mở file, bỏ dấu `;` trước dòng `extension=pdo_mysql`, `extension=mbstring`, `extension=fileinfo`, lưu lại rồi khởi động lại Apache/Nginx trong Laragon.
+- **Port 8000/5180/3306 đã bị chiếm**: đổi port tương ứng (`php artisan serve --port=8001`, hoặc sửa `storefront/vite.config.js`, hoặc đổi port MySQL trong cấu hình Laragon).

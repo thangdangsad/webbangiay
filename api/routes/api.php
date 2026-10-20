@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\CartController;
@@ -60,6 +63,18 @@ Route::middleware('auth:admin')->prefix('admin')->group(function () {
     Route::post('/categories', [AdminCategoryController::class, 'store']);
     Route::match(['put', 'patch'], '/categories/{category}', [AdminCategoryController::class, 'update']);
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+
+    Route::get('/orders', [AdminOrderController::class, 'index']);
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+    Route::match(['put', 'patch'], '/orders/{order}', [AdminOrderController::class, 'update']);
+
+    Route::get('/customers', [AdminCustomerController::class, 'index']);
+    Route::get('/customers/{customer}', [AdminCustomerController::class, 'show']);
+
+    Route::get('/staff', [AdminStaffController::class, 'index']);
+    Route::post('/staff', [AdminStaffController::class, 'store']);
+    Route::match(['put', 'patch'], '/staff/{staff}', [AdminStaffController::class, 'update']);
+    Route::match(['put', 'patch'], '/staff/{staff}/password', [AdminStaffController::class, 'updatePassword']);
 });
 
 /*

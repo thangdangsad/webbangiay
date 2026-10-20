@@ -6,6 +6,7 @@ use App\Concerns\LazilyMigratesLegacyPassword;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -35,6 +36,19 @@ class CustomerAccount extends Authenticatable
     public function getAuthPasswordName(): string
     {
         return 'user_password';
+    }
+
+    /**
+     * Order history for this login account, resolved via the shared
+     * `user_code` link that OrderService::resolveUserCode() writes onto
+     * both this row and the `customer` (OrderCustomerInfo) row at checkout
+     * time. Not a real foreign key — just like legacy, it's a soft link
+     * through a random 4-digit code, so `user_code` 0/null (never checked
+     * out yet) must be excluded by the caller.
+     */
+    public function orderHistory(): HasMany
+    {
+        return $this->hasMany(OrderCustomerInfo::class, 'user_code', 'user_code');
     }
 
     /**
