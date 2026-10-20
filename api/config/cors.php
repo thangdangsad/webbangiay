@@ -19,15 +19,15 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // storefront (Vite dev server), first-party SPA. 5173 is reserved by
-    // Sail/compose.yaml for Laravel's own unused built-in Vite assets, and
-    // 5174 is already bound on the dev host by an unrelated project, so
-    // storefront uses 5180 instead. A future admin-panel app gets its own
-    // origin added here (e.g. http://localhost:5175) — keep this a list so
-    // adding that origin later doesn't require restructuring it.
+    // storefront + admin-panel (Vite dev servers), both first-party SPAs.
+    // 5173 is reserved by Sail/compose.yaml for Laravel's own unused built-in
+    // Vite assets, and 5174 is already bound on the dev host by an unrelated
+    // project, so storefront uses 5180. admin-panel uses 5175.
     'allowed_origins' => [
         'http://localhost:5180',
         'http://127.0.0.1:5180',
+        'http://localhost:5175',
+        'http://127.0.0.1:5175',
     ],
 
     'allowed_origins_patterns' => [],
