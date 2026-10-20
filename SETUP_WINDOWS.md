@@ -2,20 +2,22 @@
 
 Cách này cài PHP, Composer, MySQL **trực tiếp lên Windows**, không qua Docker.
 
-## 1. Cài Laragon (khuyên dùng — có sẵn PHP + MySQL + Composer)
+## 1. Cài PHP + Composer
 
-[Laragon](https://laragon.org/download/) là công cụ phổ biến cho dev PHP trên Windows, cài 1 lần có đủ PHP, MySQL, Composer, Apache/Nginx, không cần cấu hình gì thêm.
+Project **không dùng MySQL cài local** — database thật chạy trên **TiDB Cloud** (xem mục 4), nên bạn chỉ cần cài PHP + Composer, không cần Laragon hay MySQL Installer.
 
-1. Tải **Laragon Full** (bản Full đã kèm sẵn PHP/MySQL/Composer): https://laragon.org/download/
+Cách nhanh nhất là dùng [Laragon](https://laragon.org/download/) (chỉ để lấy PHP + Composer có sẵn, phần MySQL đi kèm Laragon thì bỏ qua, không cần Start):
+
+1. Tải **Laragon Full**: https://laragon.org/download/
 2. Cài đặt (Next liên tục là xong).
-3. Mở Laragon, bấm **Start All** — nó sẽ bật Apache/Nginx + MySQL.
-4. Kiểm tra PHP/Composer có sẵn: mở **Laragon → Terminal** (hoặc "Cmder" trong menu Laragon), gõ:
+3. Mở **Laragon → Terminal** (hoặc "Cmder" trong menu Laragon) để có PHP/Composer trong PATH, gõ kiểm tra:
    ```
    php -v
    composer -V
    ```
+4. Không cần bấm "Start All" / không cần khởi động MySQL của Laragon — project kết nối thẳng tới database trên cloud.
 
-> Nếu không muốn dùng Laragon, có thể cài riêng lẻ: PHP tại https://windows.php.net/download/ (bản Thread Safe, >= 8.2), Composer tại https://getcomposer.org/download/, MySQL tại https://dev.mysql.com/downloads/installer/. Phần hướng dẫn bên dưới vẫn áp dụng, chỉ khác bước khởi động MySQL/PHP.
+> Nếu không muốn dùng Laragon, có thể cài riêng lẻ: PHP tại https://windows.php.net/download/ (bản Thread Safe, >= 8.2), Composer tại https://getcomposer.org/download/. Không cần cài MySQL ở bước này.
 
 ## 2. Lấy code về
 
@@ -37,33 +39,34 @@ copy .env.example .env
 php artisan key:generate
 ```
 
-## 4. Tạo database MySQL
+## 4. Database: TiDB Cloud (không cần tạo/cài gì local)
 
-Mở **Laragon → Menu → MySQL → HeidiSQL** (hoặc phpMyAdmin, hoặc bất kỳ tool GUI nào bạn quen: HeidiSQL/TablePlus/MySQL Workbench), kết nối:
+Database dùng chung cho cả team đã có sẵn trên **TiDB Cloud** (MySQL-compatible, serverless) — không cần cài MySQL, không cần tạo database mới, chỉ cần config `.env` để kết nối tới.
 
-| Thông số | Giá trị mặc định Laragon |
-|---|---|
-| Host | `127.0.0.1` |
-| Port | `3306` |
-| User | `root` |
-| Password | *(để trống — Laragon mặc định không đặt password root)* |
+Xin thông tin kết nối (host/user/password) từ người quản lý project (không ghi trực tiếp trong file này vì đây là file commit lên git). Nếu muốn xem bằng GUI, có thể dùng HeidiSQL/TablePlus/DBeaver/IntelliJ Database tool, kết nối qua driver MySQL tới host TiDB Cloud, bật SSL.
 
-Tạo database mới tên `laravel` (hoặc tên tuỳ bạn, miễn khớp với `.env` ở bước sau).
+## 5. Cấu hình `.env` kết nối database
 
-## 5. Cấu hình `.env` kết nối MySQL
-
-Mở file `api/.env`, sửa phần DB:
+Mở file `api/.env` (copy từ `.env.example` nếu chưa có), sửa phần DB theo thông tin TiDB Cloud được cấp:
 
 ```env
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=
+DB_HOST=gateway01.ap-southeast-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_DATABASE=<tên-database-được-cấp>
+DB_USERNAME=<username-được-cấp>
+DB_PASSWORD=<password-được-cấp>
 ```
 
-(Nếu không dùng Laragon mà tự cài MySQL riêng, điền đúng user/password bạn đã đặt lúc cài MySQL.)
+TiDB Cloud yêu cầu kết nối qua **TLS/SSL**, cần chỉ Laravel tới file CA cert gốc hệ thống. Trên Windows (dùng Laragon), thêm dòng:
+
+```env
+MYSQL_ATTR_SSL_CA=C:\laragon\bin\php\<phiên-bản-php>\extras\ssl\cacert.pem
+```
+
+(Nếu không có sẵn file CA cert, tải bộ CA bundle của Mozilla tại https://curl.se/ca/cacert.pem, lưu vào máy rồi chỉ đường dẫn tới đó.)
+
+Sau khi sửa `.env`, chạy `php artisan config:clear` để Laravel đọc lại config mới.
 
 ## 6. Chạy migration + test
 
@@ -96,14 +99,13 @@ Mặc định chạy ở `http://localhost:5180`. Nếu port bị trùng, đổi
 
 ## 9. Thứ tự khởi động mỗi lần làm việc
 
-1. Mở Laragon, bấm **Start All** (bật MySQL).
-2. Trong `api/`: `php artisan serve`
-3. Trong `storefront/`: `npm run dev`
-4. Mở trình duyệt: `http://localhost:5180`
+1. Trong `api/`: `php artisan serve` (không cần bật MySQL local — DB đã chạy sẵn trên TiDB Cloud).
+2. Trong `storefront/`: `npm run dev`
+3. Mở trình duyệt: `http://localhost:5180`
 
 ## Sự cố thường gặp
 
 - **`php` hoặc `composer` không nhận lệnh**: PHP/Composer của Laragon chưa được thêm vào PATH — mở lại terminal từ trong Laragon (nó tự set PATH), hoặc tự thêm đường dẫn `C:\laragon\bin\php\php-x.x.x` vào biến môi trường PATH của Windows.
-- **`php artisan migrate` báo lỗi kết nối DB**: kiểm tra MySQL đã "Start" trong Laragon chưa, và `.env` đã đúng host/port/user/password/database chưa, rồi chạy `php artisan config:clear`.
+- **`php artisan migrate`/`serve` báo lỗi kết nối DB** (ví dụ "SQLSTATE[HY000] [2002]" hoặc lỗi SSL): kiểm tra `.env` đã đúng `DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` theo thông tin được cấp chưa, đường dẫn `MYSQL_ATTR_SSL_CA` có tồn tại trên máy không, rồi chạy `php artisan config:clear`. Cũng kiểm tra mạng/firewall công ty có chặn kết nối ra ngoài cổng `4000` không — TiDB Cloud yêu cầu kết nối Internet, không chạy được offline.
 - **Thiếu extension PHP** (ví dụ lỗi "pdo_mysql" hoặc "mbstring"): Laragon → Menu → PHP → php.ini, mở file, bỏ dấu `;` trước dòng `extension=pdo_mysql`, `extension=mbstring`, `extension=fileinfo`, lưu lại rồi khởi động lại Apache/Nginx trong Laragon.
-- **Port 8000/5180/3306 đã bị chiếm**: đổi port tương ứng (`php artisan serve --port=8001`, hoặc sửa `storefront/vite.config.js`, hoặc đổi port MySQL trong cấu hình Laragon).
+- **Port 8000/5180 đã bị chiếm**: đổi port tương ứng (`php artisan serve --port=8001`, hoặc sửa `storefront/vite.config.js`).
