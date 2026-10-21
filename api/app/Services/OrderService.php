@@ -7,8 +7,10 @@ use App\Models\CustomerAccount;
 use App\Models\Order;
 use App\Models\OrderCustomerInfo;
 use App\Models\OrderTransaction;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Writes orders from a resolved cart. Legacy `thanhtoan.php` duplicates this
@@ -35,6 +37,8 @@ class OrderService
     public function createCodOrder(array $shippingInfo, Collection $cartItems, ?CustomerAccount $account = null): array
     {
         return DB::transaction(function () use ($shippingInfo, $cartItems, $account) {
+            $this->reserveStock($cartItems);
+
             $userCode = $this->resolveUserCode($account);
 
             $customerInfo = OrderCustomerInfo::create([
@@ -79,6 +83,59 @@ class OrderService
                 'total_payment' => $totalPayment,
             ];
         });
+    }
+
+    /**
+     * Lock and validate stock for every distinct product in the cart, then
+     * decrement it — all inside the caller's DB transaction.
+     *
+     * Two customers checking out the same low-stock product at the same
+     * moment is a real race: without locking, both requests could read the
+     * same "1 left" quantity and both succeed, overselling it. `lockForUpdate`
+     * takes a row lock on each `product` row (SELECT ... FOR UPDATE), so a
+     * second concurrent checkout touching the same product blocks until the
+     * first transaction commits (stock decremented) or rolls back (stock
+     * check failed) — it can never read a stale quantity mid-flight.
+     *
+     * Products are locked in a fixed order (sorted by product_id) so that
+     * two checkouts sharing several products always acquire their locks in
+     * the same order, which avoids a deadlock (A locks product 1 then waits
+     * on 2, while B locks product 2 then waits on 1).
+     *
+     * @param  Collection<int, Cart>  $cartItems
+     */
+    private function reserveStock(Collection $cartItems): void
+    {
+        $requestedByProduct = $cartItems
+            ->groupBy('product_id')
+            ->map(fn (Collection $lines): int => (int) $lines->sum('product_quantity'));
+
+        $products = Product::query()
+            ->whereIn('product_id', $requestedByProduct->keys())
+            ->orderBy('product_id')
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('product_id');
+
+        $insufficient = [];
+
+        foreach ($requestedByProduct as $productId => $requestedQuantity) {
+            $product = $products->get($productId);
+
+            if (! $product || (int) $product->product_quantity < $requestedQuantity) {
+                $insufficient[] = $product->product_name ?? "#{$productId}";
+            }
+        }
+
+        if ($insufficient !== []) {
+            throw ValidationException::withMessages([
+                'cart' => ['Sản phẩm sau không đủ số lượng trong kho: '.implode(', ', $insufficient).'.'],
+            ]);
+        }
+
+        foreach ($requestedByProduct as $productId => $requestedQuantity) {
+            $products->get($productId)->decrement('product_quantity', $requestedQuantity);
+        }
     }
 
     /**
