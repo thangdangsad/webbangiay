@@ -2,6 +2,12 @@
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import Button from 'primevue/button'
+import Card from 'primevue/card'
+import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
+import Password from 'primevue/password'
+
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -33,24 +39,46 @@ async function submit() {
 
 <template>
   <div class="auth-page">
-    <form class="card auth-form" @submit.prevent="submit">
-      <h2>Czuka Admin</h2>
-      <p class="subtitle">Đăng nhập dành cho quản trị viên &amp; nhân viên</p>
-      <p v-if="errorMessage" class="alert alert-error">{{ errorMessage }}</p>
+    <Card class="auth-card">
+      <template #title>
+        <div class="auth-title">
+          <i class="pi pi-box"></i>
+          <span>Czuka Admin</span>
+        </div>
+        <p class="auth-subtitle">Đăng nhập dành cho quản trị viên &amp; nhân viên</p>
+      </template>
+      <template #content>
+        <form class="auth-form" @submit.prevent="submit">
+          <Message v-if="errorMessage" severity="error" :closable="false">{{ errorMessage }}</Message>
 
-      <div class="form-group">
-        <label>Email</label>
-        <input v-model="form.email" type="email" required autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Mật khẩu</label>
-        <input v-model="form.password" type="password" required autocomplete="current-password" />
-      </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <InputText
+              id="email"
+              v-model="form.email"
+              type="email"
+              required
+              autocomplete="username"
+              fluid
+            />
+          </div>
+          <div class="field">
+            <label for="password">Mật khẩu</label>
+            <Password
+              id="password"
+              v-model="form.password"
+              :feedback="false"
+              toggle-mask
+              required
+              autocomplete="current-password"
+              fluid
+            />
+          </div>
 
-      <button class="btn btn-primary" type="submit" :disabled="submitting">
-        {{ submitting ? 'Đang đăng nhập...' : 'Đăng nhập' }}
-      </button>
-    </form>
+          <Button type="submit" :loading="submitting" label="Đăng nhập" fluid />
+        </form>
+      </template>
+    </Card>
   </div>
 </template>
 
@@ -60,28 +88,46 @@ async function submit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sidebar-bg);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 22px;
+}
+
+.auth-subtitle {
+  text-align: center;
+  color: var(--p-text-muted-color);
+  font-size: 13px;
+  font-weight: 400;
+  margin: 6px 0 0;
 }
 
 .auth-form {
-  width: 100%;
-  max-width: 400px;
-  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
 }
 
-.auth-form h2 {
-  margin: 0 0 4px;
-  text-align: center;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.subtitle {
-  text-align: center;
-  color: var(--color-muted);
-  font-size: 13px;
-  margin: 0 0 20px;
-}
-
-.auth-form .btn {
-  width: 100%;
+.field label {
+  font-weight: 600;
+  font-size: 14px;
 }
 </style>

@@ -1,12 +1,31 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 
+import Button from 'primevue/button'
+import Card from 'primevue/card'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import Message from 'primevue/message'
+import SelectButton from 'primevue/selectbutton'
+import Tag from 'primevue/tag'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
+
 import { http } from '@/api/client'
 import { formatDate, orderStatusLabel } from '@/utils/format'
 
 const props = defineProps({
   id: { type: [String, Number], required: true },
 })
+
+const confirm = useConfirm()
+const toast = useToast()
+
+const STATUS_OPTIONS = [
+  { label: 'Chờ xác nhận', value: 0 },
+  { label: 'Đã xác nhận', value: 1 },
+  { label: 'Đã hủy', value: 2 },
+]
 
 const order = ref(null)
 const loading = ref(true)
@@ -16,9 +35,9 @@ const updating = ref(false)
 const siblingOrders = computed(() => order.value?.customerInfo?.orders || [])
 const transactions = computed(() => order.value?.customerInfo?.transactions || [])
 
-function badgeClass(trangThai) {
+function badgeSeverity(trangThai) {
   const n = trangThai === null || trangThai === undefined ? 0 : Number(trangThai)
-  return { 0: 'badge-pending', 1: 'badge-confirmed', 2: 'badge-cancelled' }[n] ?? ''
+  return { 0: 'warn', 1: 'success', 2: 'danger' }[n] ?? 'secondary'
 }
 
 async function load() {
@@ -40,12 +59,35 @@ async function setStatus(trangThai) {
   updating.value = true
   try {
     await http.patch(`/api/admin/orders/${props.id}`, { trangThai })
+    toast.add({ severity: 'success', summary: 'Thành công', detail: 'Đã cập nhật trạng thái đơn hàng.', life: 3000 })
     await load()
   } catch {
-    alert('Cập nhật trạng thái không thành công.')
+    toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Cập nhật trạng thái không thành công.', life: 4000 })
   } finally {
     updating.value = false
   }
+}
+
+function onStatusChange(event) {
+  const value = event.value
+  if (value === null || value === undefined) return
+
+  // Cancelling an order is destructive — confirm first. Other transitions
+  // (confirm / reset to pending) apply immediately, matching prior behavior.
+  if (Number(value) === 2) {
+    confirm.require({
+      message: 'Bạn có chắc muốn hủy đơn hàng này?',
+      header: 'Xác nhận hủy đơn',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Hủy đơn',
+      rejectLabel: 'Không',
+      acceptProps: { severity: 'danger' },
+      accept: () => setStatus(2),
+    })
+    return
+  }
+
+  setStatus(value)
 }
 </script>
 
@@ -53,88 +95,76 @@ async function setStatus(trangThai) {
   <div>
     <div class="page-header">
       <h1 class="page-title">Chi tiết đơn hàng</h1>
-      <RouterLink :to="{ name: 'orders' }" class="btn btn-outline">&larr; Quay lại</RouterLink>
+      <RouterLink :to="{ name: 'orders' }">
+        <Button label="Quay lại" icon="pi pi-arrow-left" outlined />
+      </RouterLink>
     </div>
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
     <template v-else-if="order">
-      <div class="card detail-card">
-        <div class="status-row">
-          <span class="badge" :class="badgeClass(order.trangThai)">{{ orderStatusLabel(order.trangThai) }}</span>
-          <div class="status-actions">
-            <button class="btn btn-primary btn-sm" :disabled="updating" @click="setStatus(1)">Xác nhận</button>
-            <button class="btn btn-danger btn-sm" :disabled="updating" @click="setStatus(2)">Hủy</button>
-            <button class="btn btn-outline btn-sm" :disabled="updating" @click="setStatus(0)">Đặt lại chờ xác nhận</button>
+      <Card class="detail-card">
+        <template #content>
+          <div class="status-row">
+            <Tag :severity="badgeSeverity(order.trangThai)" :value="orderStatusLabel(order.trangThai)" />
+            <SelectButton
+              :model-value="Number(order.trangThai) || 0"
+              :options="STATUS_OPTIONS"
+              option-label="label"
+              option-value="value"
+              :disabled="updating"
+              @change="onStatusChange"
+            />
           </div>
-        </div>
 
-        <h3>Thông tin khách hàng</h3>
-        <dl class="detail-list">
-          <dt>Họ tên</dt>
-          <dd>{{ order.customerInfo?.customer_name || '—' }}</dd>
-          <dt>Điện thoại</dt>
-          <dd>{{ order.customerInfo?.customer_phone || '—' }}</dd>
-          <dt>Email</dt>
-          <dd>{{ order.customerInfo?.customer_email || '—' }}</dd>
-          <dt>Địa chỉ</dt>
-          <dd>{{ order.customerInfo?.customer_address || '—' }}</dd>
-          <dt>Ghi chú</dt>
-          <dd>{{ order.customerInfo?.customer_note || '—' }}</dd>
-        </dl>
+          <h3>Thông tin khách hàng</h3>
+          <dl class="detail-list">
+            <dt>Họ tên</dt>
+            <dd>{{ order.customerInfo?.customer_name || '—' }}</dd>
+            <dt>Điện thoại</dt>
+            <dd>{{ order.customerInfo?.customer_phone || '—' }}</dd>
+            <dt>Email</dt>
+            <dd>{{ order.customerInfo?.customer_email || '—' }}</dd>
+            <dt>Địa chỉ</dt>
+            <dd>{{ order.customerInfo?.customer_address || '—' }}</dd>
+            <dt>Ghi chú</dt>
+            <dd>{{ order.customerInfo?.customer_note || '—' }}</dd>
+          </dl>
 
-        <h3>Các sản phẩm trong đơn (cùng lượt thanh toán)</h3>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Sản phẩm</th>
-              <th>Số lượng</th>
-              <th>Mã đơn</th>
-              <th>Ngày đặt</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="line in siblingOrders" :key="line.order_id" :class="{ current: line.order_id === order.order_id }">
-              <td>{{ line.product?.product_name || '—' }}</td>
-              <td>{{ line.soluong }}</td>
-              <td>{{ line.mahang ?? line.order_id }}</td>
-              <td>{{ formatDate(line.ngayDatHang) }}</td>
-            </tr>
-          </tbody>
-        </table>
+          <h3>Các sản phẩm trong đơn (cùng lượt thanh toán)</h3>
+          <DataTable :value="siblingOrders" data-key="order_id" striped-rows>
+            <Column header="Sản phẩm">
+              <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+            </Column>
+            <Column field="soluong" header="Số lượng" />
+            <Column header="Mã đơn">
+              <template #body="{ data }">{{ data.mahang ?? data.order_id }}</template>
+            </Column>
+            <Column header="Ngày đặt">
+              <template #body="{ data }">{{ formatDate(data.ngayDatHang) }}</template>
+            </Column>
+          </DataTable>
 
-        <template v-if="transactions.length">
-          <h3>Giao dịch / thanh toán</h3>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Mã giao dịch</th>
-                <th>Ngày</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="t in transactions" :key="t.giaodich_id">
-                <td>{{ t.product?.product_name || '—' }}</td>
-                <td>{{ t.soluong }}</td>
-                <td>{{ t.magiaodich }}</td>
-                <td>{{ formatDate(t.ngayThangNam) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <template v-if="transactions.length">
+            <h3>Giao dịch / thanh toán</h3>
+            <DataTable :value="transactions" data-key="giaodich_id" striped-rows>
+              <Column header="Sản phẩm">
+                <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+              </Column>
+              <Column field="soluong" header="Số lượng" />
+              <Column field="magiaodich" header="Mã giao dịch" />
+              <Column header="Ngày">
+                <template #body="{ data }">{{ formatDate(data.ngayThangNam) }}</template>
+              </Column>
+            </DataTable>
+          </template>
         </template>
-      </div>
+      </Card>
     </template>
   </div>
 </template>
 
 <style scoped>
-.detail-card {
-  padding: 24px;
-}
-
 .detail-card h3 {
   margin: 24px 0 12px;
 }
@@ -146,19 +176,26 @@ async function setStatus(trangThai) {
 .status-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--p-content-border-color);
 }
 
-.status-actions {
-  display: flex;
-  gap: 8px;
+.detail-list {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  row-gap: 10px;
+  margin: 0;
 }
 
-tr.current {
-  background: #fff8e1;
+.detail-list dt {
+  font-weight: 600;
+  color: var(--p-text-muted-color);
+}
+
+.detail-list dd {
+  margin: 0;
 }
 </style>

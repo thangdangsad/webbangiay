@@ -1,6 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+import Button from 'primevue/button'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import Message from 'primevue/message'
+import Tag from 'primevue/tag'
+
 import { http } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 
@@ -29,9 +35,8 @@ async function load(currentPage = 1) {
   }
 }
 
-function goToPage(p) {
-  if (p < 1 || p > lastPage.value) return
-  load(p)
+function onPage(event) {
+  load(event.page + 1)
 }
 
 onMounted(() => load(1))
@@ -41,55 +46,57 @@ onMounted(() => load(1))
   <div>
     <div class="page-header">
       <h1 class="page-title">Nhân viên</h1>
-      <RouterLink v-if="auth.isAdmin" :to="{ name: 'staff-new' }" class="btn btn-primary">+ Thêm nhân viên</RouterLink>
+      <RouterLink v-if="auth.isAdmin" :to="{ name: 'staff-new' }">
+        <Button label="Thêm nhân viên" icon="pi pi-plus" />
+      </RouterLink>
     </div>
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <p v-else-if="staffList.length === 0" class="empty-state">Chưa có nhân viên nào.</p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
-    <template v-else>
-      <div class="card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Họ tên</th>
-              <th>Email</th>
-              <th>Điện thoại</th>
-              <th>Vai trò</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="s in staffList" :key="s.user_id">
-              <td>{{ s.user_name }}</td>
-              <td>{{ s.user_email }}</td>
-              <td>{{ s.user_phone || '—' }}</td>
-              <td>
-                <span class="badge" :class="s.role === 1 ? 'badge-role-admin' : 'badge-role-staff'">
-                  {{ s.role === 1 ? 'Quản trị viên' : 'Nhân viên' }}
-                </span>
-              </td>
-              <td>
-                <div class="row-actions" v-if="auth.isAdmin || auth.staff?.user_id === s.user_id">
-                  <RouterLink :to="{ name: 'staff-edit', params: { id: s.user_id } }" class="btn btn-outline btn-sm">
-                    Sửa
-                  </RouterLink>
-                  <RouterLink :to="{ name: 'staff-password', params: { id: s.user_id } }" class="btn btn-outline btn-sm">
-                    Đổi mật khẩu
-                  </RouterLink>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="lastPage > 1" class="pagination">
-        <button class="btn btn-outline" :disabled="page <= 1" @click="goToPage(page - 1)">Trước</button>
-        <span>Trang {{ page }} / {{ lastPage }} ({{ total }} nhân viên)</span>
-        <button class="btn btn-outline" :disabled="page >= lastPage" @click="goToPage(page + 1)">Sau</button>
-      </div>
-    </template>
+    <DataTable
+      v-else
+      :value="staffList"
+      :loading="loading"
+      data-key="user_id"
+      striped-rows
+      lazy
+      paginator
+      :rows="15"
+      :total-records="total"
+      :first="(page - 1) * 15"
+      @page="onPage"
+    >
+      <template #empty>Chưa có nhân viên nào.</template>
+      <Column field="user_name" header="Họ tên" />
+      <Column field="user_email" header="Email" />
+      <Column header="Điện thoại">
+        <template #body="{ data }">{{ data.user_phone || '—' }}</template>
+      </Column>
+      <Column header="Vai trò">
+        <template #body="{ data }">
+          <Tag :severity="data.role === 1 ? 'info' : 'secondary'" :value="data.role === 1 ? 'Quản trị viên' : 'Nhân viên'" />
+        </template>
+      </Column>
+      <Column header="" style="width: 220px">
+        <template #body="{ data }">
+          <div v-if="auth.isAdmin || auth.staff?.user_id === data.user_id" class="row-actions">
+            <RouterLink :to="{ name: 'staff-edit', params: { id: data.user_id } }">
+              <Button label="Sửa" size="small" outlined />
+            </RouterLink>
+            <RouterLink :to="{ name: 'staff-password', params: { id: data.user_id } }">
+              <Button label="Đổi mật khẩu" size="small" outlined />
+            </RouterLink>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
+
+<style scoped>
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+</style>

@@ -1,8 +1,22 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 
+import Button from 'primevue/button'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import Message from 'primevue/message'
+import Select from 'primevue/select'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
+
 import { http } from '@/api/client'
 import { formatPrice, productImageUrl } from '@/utils/format'
+
+const confirm = useConfirm()
+const toast = useToast()
 
 const products = ref([])
 const categories = ref([])
@@ -50,9 +64,8 @@ async function loadCategories() {
   }
 }
 
-function goToPage(p) {
-  if (p < 1 || p > lastPage.value) return
-  load(p)
+function onPage(event) {
+  load(event.page + 1)
 }
 
 watch(search, () => {
@@ -67,14 +80,26 @@ onMounted(() => {
   load(1)
 })
 
+function confirmRemove(product) {
+  confirm.require({
+    message: `Xóa sản phẩm "${product.product_name}"?`,
+    header: 'Xác nhận xóa',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Xóa',
+    rejectLabel: 'Hủy',
+    acceptProps: { severity: 'danger' },
+    accept: () => remove(product),
+  })
+}
+
 async function remove(product) {
-  if (!confirm(`Xóa sản phẩm "${product.product_name}"?`)) return
   deletingId.value = product.product_id
   try {
     await http.delete(`/api/admin/products/${product.product_id}`)
+    toast.add({ severity: 'success', summary: 'Thành công', detail: 'Đã xóa sản phẩm.', life: 3000 })
     await load(page.value)
   } catch {
-    alert('Xóa sản phẩm không thành công.')
+    toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Xóa sản phẩm không thành công.', life: 4000 })
   } finally {
     deletingId.value = null
   }
@@ -85,87 +110,111 @@ async function remove(product) {
   <div>
     <div class="page-header">
       <h1 class="page-title">Sản phẩm</h1>
-      <RouterLink :to="{ name: 'product-new' }" class="btn btn-primary">+ Thêm sản phẩm</RouterLink>
+      <RouterLink :to="{ name: 'product-new' }">
+        <Button label="Thêm sản phẩm" icon="pi pi-plus" />
+      </RouterLink>
     </div>
 
     <div class="toolbar">
-      <input v-model="search" type="search" placeholder="Tìm theo tên sản phẩm" style="flex: 1; max-width: 320px" />
-      <select v-model="categoryId">
-        <option value="">Tất cả danh mục</option>
-        <option v-for="c in categories" :key="c.category_id" :value="c.category_id">
-          {{ c.category_name }}
-        </option>
-      </select>
+      <IconField class="search-field">
+        <InputIcon class="pi pi-search" />
+        <InputText v-model="search" placeholder="Tìm theo tên sản phẩm" fluid />
+      </IconField>
+      <Select
+        v-model="categoryId"
+        :options="[{ category_id: '', category_name: 'Tất cả danh mục' }, ...categories]"
+        option-label="category_name"
+        option-value="category_id"
+        class="category-filter"
+      />
     </div>
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <p v-else-if="products.length === 0" class="empty-state">Không có sản phẩm nào.</p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
-    <template v-else>
-      <div class="card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Tên sản phẩm</th>
-              <th>Danh mục</th>
-              <th>Giá</th>
-              <th>Giảm giá</th>
-              <th>Số lượng</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="p in products" :key="p.product_id">
-              <td style="width: 56px">
-                <img
-                  :src="productImageUrl(p) || '/placeholder.svg'"
-                  :alt="p.product_name"
-                  class="row-thumb"
-                  @error="$event.target.src = '/placeholder.svg'"
-                />
-              </td>
-              <td>{{ p.product_name }}</td>
-              <td>{{ p.category?.category_name || '—' }}</td>
-              <td>{{ formatPrice(p.product_price) }}</td>
-              <td>{{ p.product_discount ? formatPrice(p.product_discount) : '—' }}</td>
-              <td>{{ p.product_quantity }}</td>
-              <td>
-                <div class="row-actions">
-                  <RouterLink :to="{ name: 'product-edit', params: { id: p.product_id } }" class="btn btn-outline btn-sm">
-                    Sửa
-                  </RouterLink>
-                  <button
-                    class="btn btn-danger btn-sm"
-                    :disabled="deletingId === p.product_id"
-                    @click="remove(p)"
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="lastPage > 1" class="pagination">
-        <button class="btn btn-outline" :disabled="page <= 1" @click="goToPage(page - 1)">Trước</button>
-        <span>Trang {{ page }} / {{ lastPage }} ({{ total }} sản phẩm)</span>
-        <button class="btn btn-outline" :disabled="page >= lastPage" @click="goToPage(page + 1)">Sau</button>
-      </div>
-    </template>
+    <DataTable
+      v-else
+      :value="products"
+      :loading="loading"
+      data-key="product_id"
+      striped-rows
+      lazy
+      paginator
+      :rows="15"
+      :total-records="total"
+      :first="(page - 1) * 15"
+      @page="onPage"
+    >
+      <template #empty>Không có sản phẩm nào.</template>
+      <Column header="" style="width: 64px">
+        <template #body="{ data }">
+          <img
+            :src="productImageUrl(data) || '/placeholder.svg'"
+            :alt="data.product_name"
+            class="row-thumb"
+            @error="$event.target.src = '/placeholder.svg'"
+          />
+        </template>
+      </Column>
+      <Column field="product_name" header="Tên sản phẩm" />
+      <Column header="Danh mục">
+        <template #body="{ data }">{{ data.category?.category_name || '—' }}</template>
+      </Column>
+      <Column header="Giá">
+        <template #body="{ data }">{{ formatPrice(data.product_price) }}</template>
+      </Column>
+      <Column header="Giảm giá">
+        <template #body="{ data }">{{ data.product_discount ? formatPrice(data.product_discount) : '—' }}</template>
+      </Column>
+      <Column field="product_quantity" header="Số lượng" />
+      <Column header="" style="width: 140px">
+        <template #body="{ data }">
+          <div class="row-actions">
+            <RouterLink :to="{ name: 'product-edit', params: { id: data.product_id } }">
+              <Button icon="pi pi-pencil" text rounded severity="secondary" />
+            </RouterLink>
+            <Button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              :loading="deletingId === data.product_id"
+              @click="confirmRemove(data)"
+            />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
 
 <style scoped>
+.toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1;
+  max-width: 320px;
+}
+
+.category-filter {
+  min-width: 220px;
+}
+
 .row-thumb {
   width: 40px;
   height: 40px;
   border-radius: 6px;
   object-fit: cover;
-  background: #f1f3f5;
+  background: var(--p-surface-100);
   display: block;
+}
+
+.row-actions {
+  display: flex;
+  gap: 4px;
 }
 </style>

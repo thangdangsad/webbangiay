@@ -1,8 +1,15 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+import Button from 'primevue/button'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+import Message from 'primevue/message'
+import SelectButton from 'primevue/selectbutton'
+import Tag from 'primevue/tag'
+
 import { http } from '@/api/client'
-import { formatPrice, orderStatusLabel } from '@/utils/format'
+import { orderStatusLabel } from '@/utils/format'
 
 const TABS = [
   { label: 'Chờ xác nhận', value: 0 },
@@ -19,9 +26,9 @@ const page = ref(1)
 const lastPage = ref(1)
 const total = ref(0)
 
-function badgeClass(trangThai) {
+function badgeSeverity(trangThai) {
   const n = trangThai === null || trangThai === undefined ? 0 : Number(trangThai)
-  return { 0: 'badge-pending', 1: 'badge-confirmed', 2: 'badge-cancelled' }[n] ?? ''
+  return { 0: 'warn', 1: 'success', 2: 'danger' }[n] ?? 'secondary'
 }
 
 async function load(currentPage = 1) {
@@ -42,14 +49,12 @@ async function load(currentPage = 1) {
   }
 }
 
-function selectTab(value) {
-  status.value = value
+function onTabChange() {
   load(1)
 }
 
-function goToPage(p) {
-  if (p < 1 || p > lastPage.value) return
-  load(p)
+function onPage(event) {
+  load(event.page + 1)
 }
 
 onMounted(() => load(1))
@@ -61,57 +66,62 @@ onMounted(() => load(1))
       <h1 class="page-title">Đơn hàng</h1>
     </div>
 
-    <div class="tabs">
-      <button
-        v-for="t in TABS"
-        :key="String(t.value)"
-        class="tab"
-        :class="{ active: status === t.value }"
-        @click="selectTab(t.value)"
-      >
-        {{ t.label }}
-      </button>
-    </div>
+    <SelectButton
+      v-model="status"
+      :options="TABS"
+      option-label="label"
+      option-value="value"
+      class="status-tabs"
+      @change="onTabChange"
+    />
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <p v-else-if="orders.length === 0" class="empty-state">Không có đơn hàng nào.</p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
-    <template v-else>
-      <div class="card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Mã đơn</th>
-              <th>Sản phẩm</th>
-              <th>Khách hàng</th>
-              <th>Số lượng</th>
-              <th>Trạng thái</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="o in orders" :key="o.order_id">
-              <td>{{ o.mahang ?? o.order_id }}</td>
-              <td>{{ o.product?.product_name || '—' }}</td>
-              <td>{{ o.customerInfo?.customer_name || '—' }}</td>
-              <td>{{ o.soluong ?? '—' }}</td>
-              <td><span class="badge" :class="badgeClass(o.trangThai)">{{ orderStatusLabel(o.trangThai) }}</span></td>
-              <td>
-                <RouterLink :to="{ name: 'order-detail', params: { id: o.order_id } }" class="btn btn-outline btn-sm">
-                  Xem
-                </RouterLink>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="lastPage > 1" class="pagination">
-        <button class="btn btn-outline" :disabled="page <= 1" @click="goToPage(page - 1)">Trước</button>
-        <span>Trang {{ page }} / {{ lastPage }} ({{ total }} đơn)</span>
-        <button class="btn btn-outline" :disabled="page >= lastPage" @click="goToPage(page + 1)">Sau</button>
-      </div>
-    </template>
+    <DataTable
+      v-else
+      :value="orders"
+      :loading="loading"
+      data-key="order_id"
+      striped-rows
+      lazy
+      paginator
+      :rows="15"
+      :total-records="total"
+      :first="(page - 1) * 15"
+      @page="onPage"
+    >
+      <template #empty>Không có đơn hàng nào.</template>
+      <Column header="Mã đơn">
+        <template #body="{ data }">{{ data.mahang ?? data.order_id }}</template>
+      </Column>
+      <Column header="Sản phẩm">
+        <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+      </Column>
+      <Column header="Khách hàng">
+        <template #body="{ data }">{{ data.customerInfo?.customer_name || '—' }}</template>
+      </Column>
+      <Column header="Số lượng">
+        <template #body="{ data }">{{ data.soluong ?? '—' }}</template>
+      </Column>
+      <Column header="Trạng thái">
+        <template #body="{ data }">
+          <Tag :severity="badgeSeverity(data.trangThai)" :value="orderStatusLabel(data.trangThai)" />
+        </template>
+      </Column>
+      <Column header="" style="width: 100px">
+        <template #body="{ data }">
+          <RouterLink :to="{ name: 'order-detail', params: { id: data.order_id } }">
+            <Button label="Xem" size="small" outlined />
+          </RouterLink>
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
+
+<style scoped>
+.status-tabs {
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+</style>

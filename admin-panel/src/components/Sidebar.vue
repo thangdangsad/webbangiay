@@ -1,104 +1,122 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
 import { useAuthStore } from '@/stores/auth'
 
-const auth = useAuthStore()
-const router = useRouter()
+defineProps({
+  visible: { type: Boolean, default: true },
+})
 
-async function doLogout() {
-  await auth.logout()
-  router.push({ name: 'login' })
-}
+const auth = useAuthStore()
+
+const items = [
+  { label: 'Tổng quan', icon: 'pi pi-home', to: { name: 'dashboard' } },
+  { label: 'Sản phẩm', icon: 'pi pi-shopping-bag', to: { name: 'products' } },
+  { label: 'Danh mục', icon: 'pi pi-tags', to: { name: 'categories' } },
+  { label: 'Đơn hàng', icon: 'pi pi-shopping-cart', to: { name: 'orders' } },
+  { label: 'Khách hàng', icon: 'pi pi-users', to: { name: 'customers' } },
+  { label: 'Nhân viên', icon: 'pi pi-id-card', to: { name: 'staff' }, adminOnly: true },
+]
 </script>
 
 <template>
-  <aside class="sidebar">
-    <div class="brand">Czuka Admin</div>
-
-    <nav class="nav">
-      <RouterLink to="/" exact-active-class="active">Tổng quan</RouterLink>
-      <RouterLink to="/products" active-class="active">Sản phẩm</RouterLink>
-      <RouterLink to="/categories" active-class="active">Danh mục</RouterLink>
-      <RouterLink to="/orders" active-class="active">Đơn hàng</RouterLink>
-      <RouterLink to="/customers" active-class="active">Khách hàng</RouterLink>
-      <RouterLink to="/staff" active-class="active">Nhân viên</RouterLink>
-    </nav>
-
-    <div class="user-box">
-      <div class="user-name">{{ auth.staff?.user_name }}</div>
-      <div class="user-role">{{ auth.isAdmin ? 'Quản trị viên' : 'Nhân viên' }}</div>
-      <a href="#" class="logout-link" @click.prevent="doLogout">Đăng xuất</a>
+  <aside class="app-sidebar" :class="{ 'app-sidebar-hidden': !visible }">
+    <div class="sidebar-brand">
+      <i class="pi pi-box"></i>
+      <span>Czuka Shop</span>
     </div>
+
+    <nav class="sidebar-nav">
+      <template v-for="item in items" :key="item.label">
+        <RouterLink
+          v-if="!item.adminOnly || auth.isAdmin"
+          :to="item.to"
+          class="sidebar-link"
+          active-class="sidebar-link-active"
+          exact-active-class="sidebar-link-active"
+        >
+          <i :class="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </RouterLink>
+      </template>
+    </nav>
   </aside>
 </template>
 
 <style scoped>
-.sidebar {
-  width: 220px;
-  min-height: 100vh;
-  background: var(--sidebar-bg);
-  color: var(--sidebar-text);
+.app-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #1e293b;
+  color: #cbd5e1;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  transition: margin-left 0.2s ease;
 }
 
-.brand {
-  padding: 20px 20px;
-  font-size: 18px;
+.app-sidebar-hidden {
+  margin-left: -260px;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 24px;
+  font-size: 19px;
   font-weight: 700;
   color: #fff;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.nav {
+.sidebar-brand i {
+  font-size: 22px;
+  color: var(--p-primary-color);
+}
+
+.sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 12px 0;
+  padding: 16px 12px;
+  gap: 2px;
   flex: 1;
+  overflow-y: auto;
 }
 
-.nav a {
-  color: var(--sidebar-text);
-  padding: 11px 20px;
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-decoration: none;
   font-size: 14px;
   font-weight: 500;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.nav a:hover {
-  background: var(--sidebar-active);
+.sidebar-link i {
+  font-size: 16px;
+  width: 18px;
+  text-align: center;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
   text-decoration: none;
-  color: #fff;
 }
 
-.nav a.active {
-  background: var(--sidebar-active);
-  color: #fff;
-  border-left: 3px solid var(--color-primary);
+.sidebar-link-active {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
 }
 
-.user-box {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.user-name {
-  color: #fff;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.user-role {
-  font-size: 12px;
-  color: var(--sidebar-text);
-  margin-top: 2px;
-}
-
-.logout-link {
-  display: inline-block;
-  margin-top: 10px;
-  font-size: 13px;
-  color: #ff8a80;
+@media (max-width: 960px) {
+  .app-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    height: 100vh;
+  }
 }
 </style>

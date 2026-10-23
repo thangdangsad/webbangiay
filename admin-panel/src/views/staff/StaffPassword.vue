@@ -2,6 +2,11 @@
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import Button from 'primevue/button'
+import Card from 'primevue/card'
+import Message from 'primevue/message'
+import Password from 'primevue/password'
+
 import { http } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 
@@ -67,56 +72,103 @@ async function submit() {
       <h1 class="page-title">Đổi mật khẩu</h1>
     </div>
 
-    <form class="card form-card" @submit.prevent="submit">
-      <p v-if="errorMessage" class="alert alert-error">{{ errorMessage }}</p>
-      <p v-if="successMessage" class="alert alert-success">{{ successMessage }}</p>
-      <p v-if="!isSelf" class="hint">
-        Bạn đang đặt lại mật khẩu cho một tài khoản khác (không cần mật khẩu hiện tại).
-      </p>
+    <Card class="form-card">
+      <template #content>
+        <form class="password-form" @submit.prevent="submit">
+          <Message v-if="errorMessage" severity="error" :closable="false">{{ errorMessage }}</Message>
+          <Message v-if="successMessage" severity="success" :closable="false">{{ successMessage }}</Message>
+          <p v-if="!isSelf" class="hint">
+            Bạn đang đặt lại mật khẩu cho một tài khoản khác (không cần mật khẩu hiện tại).
+          </p>
 
-      <div v-if="isSelf" class="form-group">
-        <label>Mật khẩu hiện tại *</label>
-        <input v-model="form.current_password" type="password" required autocomplete="current-password" />
-        <small v-if="fieldErrors.current_password" class="field-error">{{ fieldErrors.current_password[0] }}</small>
-      </div>
+          <div v-if="isSelf" class="field">
+            <label for="current_password">Mật khẩu hiện tại *</label>
+            <Password
+              id="current_password"
+              v-model="form.current_password"
+              :feedback="false"
+              toggle-mask
+              required
+              autocomplete="current-password"
+              fluid
+            />
+            <small v-if="fieldErrors.current_password" class="field-error">{{ fieldErrors.current_password[0] }}</small>
+          </div>
 
-      <div class="form-group">
-        <label>Mật khẩu mới * (ít nhất 6 ký tự)</label>
-        <input v-model="form.password" type="password" minlength="6" required autocomplete="new-password" />
-        <small v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password[0] }}</small>
-      </div>
+          <div class="field">
+            <label for="password">Mật khẩu mới * (ít nhất 6 ký tự)</label>
+            <Password
+              id="password"
+              v-model="form.password"
+              :feedback="false"
+              toggle-mask
+              required
+              autocomplete="new-password"
+              fluid
+            />
+            <small v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password[0] }}</small>
+          </div>
 
-      <div class="form-group">
-        <label>Xác nhận mật khẩu mới *</label>
-        <input v-model="form.password_confirmation" type="password" minlength="6" required autocomplete="new-password" />
-      </div>
+          <div class="field">
+            <label for="password_confirmation">Xác nhận mật khẩu mới *</label>
+            <Password
+              id="password_confirmation"
+              v-model="form.password_confirmation"
+              :feedback="false"
+              toggle-mask
+              required
+              autocomplete="new-password"
+              fluid
+            />
+          </div>
 
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit" :disabled="submitting">
-          {{ submitting ? 'Đang lưu...' : 'Đổi mật khẩu' }}
-        </button>
-        <RouterLink :to="{ name: 'staff' }" class="btn btn-outline">Hủy</RouterLink>
-      </div>
-    </form>
+          <div class="form-actions">
+            <Button type="submit" :loading="submitting" label="Đổi mật khẩu" icon="pi pi-check" />
+            <RouterLink :to="{ name: 'staff' }">
+              <Button type="button" label="Hủy" severity="secondary" outlined />
+            </RouterLink>
+          </div>
+        </form>
+      </template>
+    </Card>
   </div>
 </template>
 
 <style scoped>
 .form-card {
-  padding: 24px;
   max-width: 480px;
 }
 
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.field-error {
+  color: var(--p-red-500);
+}
+
 .hint {
-  color: var(--color-muted);
+  color: var(--p-text-muted-color);
   font-size: 13px;
-  margin-top: -6px;
-  margin-bottom: 14px;
+  margin: -6px 0 0;
 }
 
 .form-actions {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 </style>

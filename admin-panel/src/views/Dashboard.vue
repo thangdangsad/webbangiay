@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+import Card from 'primevue/card'
+
 import { http } from '@/api/client'
 
 const pendingOrders = ref(null)
@@ -33,31 +35,94 @@ onMounted(async () => {
     </div>
 
     <div class="stat-grid">
-      <RouterLink :to="{ name: 'orders' }" class="card stat-card">
-        <div class="stat-label">Đơn chờ xác nhận</div>
-        <div class="stat-value">{{ loading ? '…' : pendingOrders ?? '—' }}</div>
+      <RouterLink :to="{ name: 'orders' }" class="stat-link">
+        <Card class="stat-card">
+          <template #content>
+            <div class="stat-icon stat-icon-warning"><i class="pi pi-clock"></i></div>
+            <div class="stat-label">Đơn chờ xác nhận</div>
+            <div class="stat-value">{{ loading ? '…' : pendingOrders ?? '—' }}</div>
+          </template>
+        </Card>
       </RouterLink>
-      <RouterLink :to="{ name: 'products' }" class="card stat-card">
-        <div class="stat-label">Tổng sản phẩm</div>
-        <div class="stat-value">{{ loading ? '…' : totalProducts ?? '—' }}</div>
+      <RouterLink :to="{ name: 'products' }" class="stat-link">
+        <Card class="stat-card">
+          <template #content>
+            <div class="stat-icon stat-icon-primary"><i class="pi pi-shopping-bag"></i></div>
+            <div class="stat-label">Tổng sản phẩm</div>
+            <div class="stat-value">{{ loading ? '…' : totalProducts ?? '—' }}</div>
+          </template>
+        </Card>
       </RouterLink>
-      <RouterLink :to="{ name: 'customers' }" class="card stat-card">
-        <div class="stat-label">Tổng khách hàng</div>
-        <div class="stat-value">{{ loading ? '…' : totalCustomers ?? '—' }}</div>
+      <RouterLink :to="{ name: 'customers' }" class="stat-link">
+        <Card class="stat-card">
+          <template #content>
+            <div class="stat-icon stat-icon-success"><i class="pi pi-users"></i></div>
+            <div class="stat-label">Tổng khách hàng</div>
+            <div class="stat-value">{{ loading ? '…' : totalCustomers ?? '—' }}</div>
+          </template>
+        </Card>
       </RouterLink>
     </div>
   </div>
 </template>
 
 <style scoped>
-.stat-card {
-  display: block;
-  color: var(--color-text);
-  text-decoration: none;
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
 }
 
-.stat-card:hover {
+.stat-link {
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  color: inherit;
+  display: block;
+}
+
+.stat-card {
+  transition: box-shadow 0.15s;
+}
+
+.stat-link:hover .stat-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.stat-icon-primary {
+  background: color-mix(in srgb, var(--p-primary-color) 15%, transparent);
+  color: var(--p-primary-color);
+}
+
+.stat-icon-warning {
+  background: #fff4de;
+  color: #9a6700;
+}
+
+.stat-icon-success {
+  background: #e7f6ec;
+  color: #1e6b36;
+}
+
+.stat-label {
+  color: var(--p-text-muted-color);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 6px;
 }
 </style>
