@@ -153,7 +153,7 @@ async function submit() {
             :key="item.cart_id"
             class="flex justify-between text-sm text-ink-600"
           >
-            <span>x{{ item.product_quantity }} {{ item.product_name }}</span>
+            <span>x{{ item.product_quantity }} {{ item.product_name }}<span v-if="item.size"> · Size {{ item.size }}</span></span>
             <span class="font-medium text-ink-800">{{ formatPrice(item.product_price * item.product_quantity) }}</span>
           </li>
         </ul>

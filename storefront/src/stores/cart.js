@@ -25,9 +25,9 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async addItem(productId, quantity = 1) {
+    async addItem(variantId, quantity = 1) {
       const { data } = await http.post('/api/cart/items', {
-        product_id: productId,
+        variant_id: variantId,
         quantity,
       })
       await this.fetchCart()

@@ -19,6 +19,18 @@ const displayPrice = computed(() =>
   hasDiscount.value ? props.product.product_discount : props.product.product_price,
 )
 
+/**
+ * Stock hint from the variants the list/detail endpoints eager-load
+ * (already filtered to is_active=true). Only rendered when the response
+ * actually included a `variants` array — some endpoints (e.g. the
+ * "similar products" block) don't load it, and we skip the hint there
+ * rather than firing an extra request per card.
+ */
+const inStockVariantCount = computed(() => {
+  if (!Array.isArray(props.product.variants)) return null
+  return props.product.variants.filter((v) => Number(v.product_quantity) > 0).length
+})
+
 function onImgError(e) {
   e.target.src = '/placeholder.svg'
 }
@@ -48,6 +60,10 @@ function onImgError(e) {
           {{ formatPrice(product.product_price) }}
         </span>
       </div>
+      <p v-if="inStockVariantCount === 0" class="mt-1 text-xs font-semibold text-red-600">Hết hàng</p>
+      <p v-else-if="inStockVariantCount !== null" class="mt-1 text-xs text-ink-400">
+        {{ inStockVariantCount }} size còn hàng
+      </p>
     </div>
   </RouterLink>
 </template>

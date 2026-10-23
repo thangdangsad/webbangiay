@@ -95,7 +95,10 @@ onMounted(() => load(1))
         <template #body="{ data }">{{ data.mahang ?? data.order_id }}</template>
       </Column>
       <Column header="Sản phẩm">
-        <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+        <template #body="{ data }">{{ data.variant?.product?.product_name || '—' }}</template>
+      </Column>
+      <Column header="Size">
+        <template #body="{ data }">{{ data.variant?.size || '—' }}</template>
       </Column>
       <Column header="Khách hàng">
         <template #body="{ data }">{{ data.customerInfo?.customer_name || '—' }}</template>

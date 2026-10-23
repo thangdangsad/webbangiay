@@ -66,7 +66,9 @@ async function removeItem(item) {
           />
 
           <div class="flex-1">
-            <p class="font-semibold text-ink-800">{{ item.product_name }}</p>
+            <p class="font-semibold text-ink-800">
+              {{ item.product_name }}<span v-if="item.size"> · Size {{ item.size }}</span>
+            </p>
             <p class="text-sm text-ink-500">{{ formatPrice(item.product_price) }} / sản phẩm</p>
           </div>
 

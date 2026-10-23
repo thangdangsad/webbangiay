@@ -134,7 +134,10 @@ function onStatusChange(event) {
           <h3>Các sản phẩm trong đơn (cùng lượt thanh toán)</h3>
           <DataTable :value="siblingOrders" data-key="order_id" striped-rows>
             <Column header="Sản phẩm">
-              <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+              <template #body="{ data }">{{ data.variant?.product?.product_name || '—' }}</template>
+            </Column>
+            <Column header="Size">
+              <template #body="{ data }">{{ data.variant?.size || '—' }}</template>
             </Column>
             <Column field="soluong" header="Số lượng" />
             <Column header="Mã đơn">
@@ -149,7 +152,10 @@ function onStatusChange(event) {
             <h3>Giao dịch / thanh toán</h3>
             <DataTable :value="transactions" data-key="giaodich_id" striped-rows>
               <Column header="Sản phẩm">
-                <template #body="{ data }">{{ data.product?.product_name || '—' }}</template>
+                <template #body="{ data }">{{ data.variant?.product?.product_name || '—' }}</template>
+              </Column>
+              <Column header="Size">
+                <template #body="{ data }">{{ data.variant?.size || '—' }}</template>
               </Column>
               <Column field="soluong" header="Số lượng" />
               <Column field="magiaodich" header="Mã giao dịch" />

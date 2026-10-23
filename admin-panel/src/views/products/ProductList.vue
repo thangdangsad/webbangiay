@@ -9,6 +9,7 @@ import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import Select from 'primevue/select'
+import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 
@@ -23,6 +24,18 @@ const categories = ref([])
 const loading = ref(true)
 const error = ref('')
 const deletingId = ref(null)
+const expandedRows = ref({})
+
+/**
+ * Aggregate "current sellable stock" for the list column: sum of
+ * product_quantity across only the ACTIVE variants (a deactivated size is
+ * no longer sellable, so it shouldn't count toward displayed stock).
+ */
+function activeStock(product) {
+  return (product.variants || [])
+    .filter((v) => v.is_active !== false)
+    .reduce((sum, v) => sum + (Number(v.product_quantity) || 0), 0)
+}
 
 const search = ref('')
 const categoryId = ref('')
@@ -36,7 +49,7 @@ async function load(currentPage = 1) {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await http.get('/api/products', {
+    const { data } = await http.get('/api/admin/products', {
       params: {
         q: search.value || undefined,
         category_id: categoryId.value || undefined,
@@ -82,10 +95,10 @@ onMounted(() => {
 
 function confirmRemove(product) {
   confirm.require({
-    message: `Xóa sản phẩm "${product.product_name}"?`,
-    header: 'Xác nhận xóa',
+    message: `Xóa sản phẩm "${product.product_name}" sẽ xóa VĨNH VIỄN sản phẩm này VÀ TẤT CẢ các size của nó (không phải chỉ một size). Hành động này không thể hoàn tác. Nếu bạn chỉ muốn ngừng bán một size, hãy xóa size đó trong màn hình sửa sản phẩm thay vì xóa cả sản phẩm ở đây.`,
+    header: 'Xác nhận xóa toàn bộ sản phẩm',
     icon: 'pi pi-exclamation-triangle',
-    acceptLabel: 'Xóa',
+    acceptLabel: 'Xóa toàn bộ',
     rejectLabel: 'Hủy',
     acceptProps: { severity: 'danger' },
     accept: () => remove(product),
@@ -133,6 +146,7 @@ async function remove(product) {
 
     <DataTable
       v-else
+      v-model:expanded-rows="expandedRows"
       :value="products"
       :loading="loading"
       data-key="product_id"
@@ -145,6 +159,7 @@ async function remove(product) {
       @page="onPage"
     >
       <template #empty>Không có sản phẩm nào.</template>
+      <Column expander style="width: 48px" />
       <Column header="" style="width: 64px">
         <template #body="{ data }">
           <img
@@ -165,7 +180,9 @@ async function remove(product) {
       <Column header="Giảm giá">
         <template #body="{ data }">{{ data.product_discount ? formatPrice(data.product_discount) : '—' }}</template>
       </Column>
-      <Column field="product_quantity" header="Số lượng" />
+      <Column header="Số lượng (đang bán)">
+        <template #body="{ data }">{{ activeStock(data) }}</template>
+      </Column>
       <Column header="" style="width: 140px">
         <template #body="{ data }">
           <div class="row-actions">
@@ -183,6 +200,25 @@ async function remove(product) {
           </div>
         </template>
       </Column>
+
+      <template #expansion="{ data }">
+        <div class="variant-breakdown">
+          <strong class="variant-breakdown-title">Chi tiết theo size — {{ data.product_name }}</strong>
+          <DataTable :value="data.variants || []" data-key="variant_id" size="small">
+            <template #empty>Không có size nào.</template>
+            <Column field="size" header="Size" />
+            <Column field="product_quantity" header="Số lượng" />
+            <Column header="Trạng thái">
+              <template #body="{ data: variant }">
+                <Tag
+                  :severity="variant.is_active === false ? 'secondary' : 'success'"
+                  :value="variant.is_active === false ? 'Ngừng bán' : 'Đang bán'"
+                />
+              </template>
+            </Column>
+          </DataTable>
+        </div>
+      </template>
     </DataTable>
   </div>
 </template>
@@ -216,5 +252,15 @@ async function remove(product) {
 .row-actions {
   display: flex;
   gap: 4px;
+}
+
+.variant-breakdown {
+  padding: 12px 16px;
+}
+
+.variant-breakdown-title {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 </style>

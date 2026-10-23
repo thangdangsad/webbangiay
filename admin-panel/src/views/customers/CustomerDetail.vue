@@ -79,7 +79,8 @@ onMounted(load)
           <template #body="{ data }">
             <ul class="line-list">
               <li v-for="line in data.orders" :key="line.order_id">
-                x{{ line.soluong }} {{ line.product?.product_name || '—' }}
+                x{{ line.soluong }} {{ line.variant?.product?.product_name || '—' }}
+                <span v-if="line.variant?.size"> (size {{ line.variant.size }})</span>
               </li>
             </ul>
           </template>
