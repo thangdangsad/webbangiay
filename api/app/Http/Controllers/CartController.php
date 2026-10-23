@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\CartResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -37,15 +37,15 @@ class CartController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'product_id' => ['required', 'integer', 'exists:product,product_id'],
+            'variant_id' => ['required', 'integer', 'exists:product_variant,variant_id'],
             'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $product = Product::findOrFail($validated['product_id']);
+        $variant = ProductVariant::with('product')->findOrFail($validated['variant_id']);
         $quantity = $validated['quantity'] ?? 1;
 
         $existing = $this->cartResolver->query($request)
-            ->where('product_id', $product->getKey())
+            ->where('variant_id', $variant->getKey())
             ->first();
 
         if ($existing) {
@@ -56,11 +56,12 @@ class CartController extends Controller
 
         $item = Cart::create([
             ...$this->cartResolver->ownerAttributes($request),
-            'product_id' => $product->getKey(),
-            'product_name' => $product->product_name,
-            'product_price' => $product->product_discount ?? $product->product_price,
-            'product_image' => $product->product_image,
+            'variant_id' => $variant->getKey(),
+            'product_name' => $variant->product->product_name,
+            'product_price' => $variant->product->product_discount ?? $variant->product->product_price,
+            'product_image' => $variant->product->product_image,
             'product_quantity' => $quantity,
+            'size' => $variant->size,
         ]);
 
         return response()->json(['data' => $item], 201);

@@ -20,9 +20,7 @@ class ProductFactory extends Factory
     {
         return [
             'product_name' => fake()->words(3, true),
-            'size' => fake()->randomElement(['S', 'M', 'L', 'XL']),
             'product_image' => fake()->lexify('????????').'.jpg',
-            'product_quantity' => fake()->numberBetween(1, 100),
             'product_price' => fake()->numberBetween(100000, 2000000),
             'product_discount' => fake()->numberBetween(50000, 1800000),
             'product_details' => fake()->sentence(),

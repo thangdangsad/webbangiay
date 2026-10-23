@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\OrderCustomerInfo;
 use App\Models\OrderTransaction;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class OrderTransactionFactory extends Factory
     {
         return [
             'khachhang_id' => OrderCustomerInfo::factory(),
-            'sanpham_id' => Product::factory(),
+            'sanpham_id' => ProductVariant::factory(),
             'soluong' => fake()->numberBetween(1, 5),
             'magiaodich' => (string) fake()->numberBetween(1000, 9999),
             'ngayThangNam' => fake()->date(),

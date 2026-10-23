@@ -6,19 +6,17 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'product_name',
-    'size',
     'product_image',
-    'product_quantity',
     'product_price',
     'product_discount',
     'product_details',
     'product_description',
     'product_acitve',
     'product_hot',
-    'product_sold',
     'category_id',
 ])]
 class Product extends Model
@@ -34,12 +32,16 @@ class Product extends Model
         return [
             'product_price' => 'decimal:0',
             'product_discount' => 'decimal:0',
-            'product_quantity' => 'integer',
         ];
     }
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id', 'category_id');
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id', 'product_id');
     }
 }

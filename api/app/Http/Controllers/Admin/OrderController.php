@@ -44,7 +44,7 @@ class OrderController extends Controller
         ]);
 
         $orders = Order::query()
-            ->with(['product', 'customerInfo'])
+            ->with(['variant', 'customerInfo'])
             ->when(isset($validated['status']), function ($query) use ($validated) {
                 $status = (int) $validated['status'];
 
@@ -69,9 +69,9 @@ class OrderController extends Controller
     public function show(Order $order): JsonResponse
     {
         $order->load([
-            'product',
-            'customerInfo.orders.product',
-            'customerInfo.transactions.product',
+            'variant',
+            'customerInfo.orders.variant',
+            'customerInfo.transactions.variant',
         ]);
 
         return response()->json(['data' => $order]);
@@ -96,7 +96,7 @@ class OrderController extends Controller
         });
 
         return response()->json([
-            'data' => $order->refresh()->load(['product', 'customerInfo']),
+            'data' => $order->refresh()->load(['variant', 'customerInfo']),
         ]);
     }
 

@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'product_id',
+    'variant_id',
     'product_name',
     'product_price',
     'product_image',
     'product_quantity',
+    'size',
     'customer_id',
     'guest_token',
 ])]
@@ -24,9 +25,9 @@ class Cart extends Model
 
     protected $primaryKey = 'cart_id';
 
-    public function product(): BelongsTo
+    public function variant(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id', 'product_id');
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'variant_id');
     }
 
     public function customer(): BelongsTo

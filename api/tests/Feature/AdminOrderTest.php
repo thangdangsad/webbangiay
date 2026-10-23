@@ -6,7 +6,7 @@ use App\Models\CustomerAccount;
 use App\Models\Order;
 use App\Models\OrderCustomerInfo;
 use App\Models\OrderTransaction;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Staff;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -39,11 +39,11 @@ class AdminOrderTest extends TestCase
     public function test_admin_can_list_orders(): void
     {
         $this->actingAsAdmin();
-        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create();
         $customerInfo = OrderCustomerInfo::factory()->create();
 
         Order::factory()->create([
-            'product_id' => $product->product_id,
+            'product_id' => $variant->variant_id,
             'customer_id' => $customerInfo->customer_id,
             'trangThai' => null,
         ]);

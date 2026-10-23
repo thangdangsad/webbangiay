@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Order;
 use App\Models\OrderCustomerInfo;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
+            'product_id' => ProductVariant::factory(),
             'customer_id' => OrderCustomerInfo::factory(),
             'soluong' => fake()->numberBetween(1, 5),
             'tongDoanhThu' => fake()->numberBetween(100000, 5000000),

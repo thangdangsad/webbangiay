@@ -26,9 +26,14 @@ class Order extends Model
 
     protected $primaryKey = 'order_id';
 
-    public function product(): BelongsTo
+    /**
+     * Column stays named `product_id` for historical reasons (unchanged by
+     * the product/variant split); it stores a `product_variant.variant_id`
+     * value.
+     */
+    public function variant(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id', 'product_id');
+        return $this->belongsTo(ProductVariant::class, 'product_id', 'variant_id');
     }
 
     public function customerInfo(): BelongsTo

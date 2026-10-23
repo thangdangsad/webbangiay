@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\CustomerAccount;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\InteractsWithStatefulSession;
 use Tests\TestCase;
@@ -27,10 +28,12 @@ class CheckoutTest extends TestCase
     {
         $productA = Product::factory()->create(['product_price' => 100000, 'product_discount' => 90000]);
         $productB = Product::factory()->create(['product_price' => 200000, 'product_discount' => 150000]);
+        $variantA = ProductVariant::factory()->create(['product_id' => $productA->product_id]);
+        $variantB = ProductVariant::factory()->create(['product_id' => $productB->product_id]);
 
-        $addA = $this->postJson('/api/cart/items', ['product_id' => $productA->product_id, 'quantity' => 2]);
+        $addA = $this->postJson('/api/cart/items', ['variant_id' => $variantA->variant_id, 'quantity' => 2]);
         $this->continueSessionFrom($addA);
-        $this->postJson('/api/cart/items', ['product_id' => $productB->product_id, 'quantity' => 1])->assertCreated();
+        $this->postJson('/api/cart/items', ['variant_id' => $variantB->variant_id, 'quantity' => 1])->assertCreated();
 
         $response = $this->postJson('/api/checkout', [
             'name' => 'Nguyen Van Khach',
@@ -55,19 +58,19 @@ class CheckoutTest extends TestCase
 
         $this->assertDatabaseCount('donhang', 2);
         $this->assertDatabaseHas('donhang', [
-            'product_id' => $productA->product_id,
+            'product_id' => $variantA->variant_id,
             'soluong' => 2,
             'mahang' => $mahang,
         ]);
         $this->assertDatabaseHas('donhang', [
-            'product_id' => $productB->product_id,
+            'product_id' => $variantB->variant_id,
             'soluong' => 1,
             'mahang' => $mahang,
         ]);
 
         $this->assertDatabaseCount('giaodich', 2);
         $this->assertDatabaseHas('giaodich', [
-            'sanpham_id' => $productA->product_id,
+            'sanpham_id' => $variantA->variant_id,
             'soluong' => 2,
             'magiaodich' => $mahang,
         ]);
@@ -94,14 +97,14 @@ class CheckoutTest extends TestCase
         $customer = CustomerAccount::factory()->create();
         $this->actingAs($customer, 'customer');
 
-        $product = Product::factory()->create(['product_quantity' => 5]);
+        $variant = ProductVariant::factory()->create(['product_quantity' => 5]);
 
-        $this->postJson('/api/cart/items', ['product_id' => $product->product_id, 'quantity' => 2])
+        $this->postJson('/api/cart/items', ['variant_id' => $variant->variant_id, 'quantity' => 2])
             ->assertCreated();
 
         $this->postJson('/api/checkout', $this->shippingPayload())->assertCreated();
 
-        $this->assertSame(3, $product->refresh()->product_quantity);
+        $this->assertSame(3, $variant->refresh()->product_quantity);
     }
 
     public function test_checkout_rejects_cart_quantity_above_available_stock(): void
@@ -109,9 +112,9 @@ class CheckoutTest extends TestCase
         $customer = CustomerAccount::factory()->create();
         $this->actingAs($customer, 'customer');
 
-        $product = Product::factory()->create(['product_quantity' => 1]);
+        $variant = ProductVariant::factory()->create(['product_quantity' => 1]);
 
-        $this->postJson('/api/cart/items', ['product_id' => $product->product_id, 'quantity' => 2])
+        $this->postJson('/api/cart/items', ['variant_id' => $variant->variant_id, 'quantity' => 2])
             ->assertCreated();
 
         $response = $this->postJson('/api/checkout', $this->shippingPayload());
@@ -122,7 +125,7 @@ class CheckoutTest extends TestCase
         // touched stock — the whole reserveStock()+order-write transaction
         // rolled back together.
         $this->assertDatabaseCount('donhang', 0);
-        $this->assertSame(1, $product->refresh()->product_quantity);
+        $this->assertSame(1, $variant->refresh()->product_quantity);
     }
 
     /**
@@ -142,19 +145,19 @@ class CheckoutTest extends TestCase
      */
     public function test_second_customer_checking_out_the_last_unit_fails_after_first_succeeds(): void
     {
-        $product = Product::factory()->create(['product_quantity' => 1]);
+        $variant = ProductVariant::factory()->create(['product_quantity' => 1]);
 
         $firstCustomer = CustomerAccount::factory()->create();
         $this->actingAs($firstCustomer, 'customer');
-        $this->postJson('/api/cart/items', ['product_id' => $product->product_id, 'quantity' => 1])
+        $this->postJson('/api/cart/items', ['variant_id' => $variant->variant_id, 'quantity' => 1])
             ->assertCreated();
         $this->postJson('/api/checkout', $this->shippingPayload())->assertCreated();
 
-        $this->assertSame(0, $product->refresh()->product_quantity);
+        $this->assertSame(0, $variant->refresh()->product_quantity);
 
         $secondCustomer = CustomerAccount::factory()->create();
         $this->actingAs($secondCustomer, 'customer');
-        $this->postJson('/api/cart/items', ['product_id' => $product->product_id, 'quantity' => 1])
+        $this->postJson('/api/cart/items', ['variant_id' => $variant->variant_id, 'quantity' => 1])
             ->assertCreated();
         $second = $this->postJson('/api/checkout', $this->shippingPayload());
 

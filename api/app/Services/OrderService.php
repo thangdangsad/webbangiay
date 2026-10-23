@@ -7,7 +7,7 @@ use App\Models\CustomerAccount;
 use App\Models\Order;
 use App\Models\OrderCustomerInfo;
 use App\Models\OrderTransaction;
-use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -59,7 +59,7 @@ class OrderService
 
             foreach ($cartItems as $item) {
                 Order::create([
-                    'product_id' => $item->product_id,
+                    'product_id' => $item->variant_id,
                     'customer_id' => $customerInfo->getKey(),
                     'soluong' => $item->product_quantity,
                     'tongDoanhThu' => $totalPayment,
@@ -70,7 +70,7 @@ class OrderService
 
                 OrderTransaction::create([
                     'khachhang_id' => $customerInfo->getKey(),
-                    'sanpham_id' => $item->product_id,
+                    'sanpham_id' => $item->variant_id,
                     'soluong' => $item->product_quantity,
                     'magiaodich' => $mahang,
                     'ngayThangNam' => $today,
@@ -86,44 +86,47 @@ class OrderService
     }
 
     /**
-     * Lock and validate stock for every distinct product in the cart, then
+     * Lock and validate stock for every distinct variant in the cart, then
      * decrement it — all inside the caller's DB transaction.
      *
-     * Two customers checking out the same low-stock product at the same
+     * Two customers checking out the same low-stock variant at the same
      * moment is a real race: without locking, both requests could read the
      * same "1 left" quantity and both succeed, overselling it. `lockForUpdate`
-     * takes a row lock on each `product` row (SELECT ... FOR UPDATE), so a
-     * second concurrent checkout touching the same product blocks until the
-     * first transaction commits (stock decremented) or rolls back (stock
+     * takes a row lock on each `product_variant` row (SELECT ... FOR UPDATE),
+     * so a second concurrent checkout touching the same variant blocks until
+     * the first transaction commits (stock decremented) or rolls back (stock
      * check failed) — it can never read a stale quantity mid-flight.
      *
-     * Products are locked in a fixed order (sorted by product_id) so that
-     * two checkouts sharing several products always acquire their locks in
-     * the same order, which avoids a deadlock (A locks product 1 then waits
-     * on 2, while B locks product 2 then waits on 1).
+     * Variants are locked in a fixed order (sorted by variant_id) so that
+     * two checkouts sharing several variants always acquire their locks in
+     * the same order, which avoids a deadlock (A locks variant 1 then waits
+     * on 2, while B locks variant 2 then waits on 1).
      *
      * @param  Collection<int, Cart>  $cartItems
      */
     private function reserveStock(Collection $cartItems): void
     {
-        $requestedByProduct = $cartItems
-            ->groupBy('product_id')
+        $requestedByVariant = $cartItems
+            ->groupBy('variant_id')
             ->map(fn (Collection $lines): int => (int) $lines->sum('product_quantity'));
 
-        $products = Product::query()
-            ->whereIn('product_id', $requestedByProduct->keys())
-            ->orderBy('product_id')
+        $variants = ProductVariant::query()
+            ->with('product')
+            ->whereIn('variant_id', $requestedByVariant->keys())
+            ->orderBy('variant_id')
             ->lockForUpdate()
             ->get()
-            ->keyBy('product_id');
+            ->keyBy('variant_id');
 
         $insufficient = [];
 
-        foreach ($requestedByProduct as $productId => $requestedQuantity) {
-            $product = $products->get($productId);
+        foreach ($requestedByVariant as $variantId => $requestedQuantity) {
+            $variant = $variants->get($variantId);
 
-            if (! $product || (int) $product->product_quantity < $requestedQuantity) {
-                $insufficient[] = $product->product_name ?? "#{$productId}";
+            if (! $variant || (int) $variant->product_quantity < $requestedQuantity) {
+                $insufficient[] = $variant
+                    ? "{$variant->product->product_name} (size {$variant->size})"
+                    : "#{$variantId}";
             }
         }
 
@@ -133,8 +136,8 @@ class OrderService
             ]);
         }
 
-        foreach ($requestedByProduct as $productId => $requestedQuantity) {
-            $products->get($productId)->decrement('product_quantity', $requestedQuantity);
+        foreach ($requestedByVariant as $variantId => $requestedQuantity) {
+            $variants->get($variantId)->decrement('product_quantity', $requestedQuantity);
         }
     }
 

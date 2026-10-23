@@ -28,8 +28,13 @@ class OrderTransaction extends Model
         return $this->belongsTo(OrderCustomerInfo::class, 'khachhang_id', 'customer_id');
     }
 
-    public function product(): BelongsTo
+    /**
+     * Column stays named `sanpham_id` for historical reasons (unchanged by
+     * the product/variant split); it stores a `product_variant.variant_id`
+     * value.
+     */
+    public function variant(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'sanpham_id', 'product_id');
+        return $this->belongsTo(ProductVariant::class, 'sanpham_id', 'variant_id');
     }
 }

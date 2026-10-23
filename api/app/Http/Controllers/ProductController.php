@@ -30,7 +30,7 @@ class ProductController extends Controller
         ]);
 
         $products = Product::query()
-            ->with('category')
+            ->with(['category', 'variants' => fn ($query) => $query->where('is_active', true)])
             ->when($validated['category_id'] ?? null, function ($query, $categoryId) {
                 $query->where('category_id', $categoryId);
             })
@@ -46,7 +46,7 @@ class ProductController extends Controller
     public function show(Product $product): JsonResponse
     {
         return response()->json([
-            'data' => $product->load('category'),
+            'data' => $product->load(['category', 'variants' => fn ($query) => $query->where('is_active', true)]),
         ]);
     }
 
