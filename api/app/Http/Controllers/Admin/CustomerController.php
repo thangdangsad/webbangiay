@@ -50,7 +50,7 @@ class CustomerController extends Controller
         return response()->json([
             'data' => $customer,
             'order_history' => $hasOrderHistory
-                ? $customer->orderHistory()->with(['orders.product', 'transactions.product'])->get()
+                ? $customer->orderHistory()->with(['orders.variant.product', 'transactions.variant.product'])->get()
                 : [],
         ]);
     }

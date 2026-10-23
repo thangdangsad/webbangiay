@@ -8,6 +8,7 @@ use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,6 +29,41 @@ use Illuminate\Support\Str;
  */
 class ProductController extends Controller
 {
+    /**
+     * Admin product list. Unlike the public catalog's index(), this eager-
+     * loads every variant regardless of `is_active` — an admin needs to see
+     * (and be able to re-save, which reactivates it) a discontinued size,
+     * not just the ones still visible to shoppers.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'category_id' => ['nullable', 'integer'],
+            'q' => ['nullable', 'string', 'max:255'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $products = Product::query()
+            ->with(['category', 'variants'])
+            ->when($validated['category_id'] ?? null, function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->when($validated['q'] ?? null, function ($query, $keyword) {
+                $query->where('product_name', 'like', '%'.$keyword.'%');
+            })
+            ->orderBy('product_id')
+            ->paginate($validated['per_page'] ?? 12);
+
+        return response()->json($this->paginatedResponse($products));
+    }
+
+    public function show(Product $product): JsonResponse
+    {
+        return response()->json([
+            'data' => $product->load(['category', 'variants']),
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate($this->rules());
@@ -80,9 +116,14 @@ class ProductController extends Controller
                 $existing = $variantId !== null ? $existingVariants->get($variantId) : null;
 
                 if ($existing) {
+                    // Presence in the posted array means "keep this size
+                    // sellable" — including reactivating one the admin had
+                    // previously removed (and thus soft-deactivated) and
+                    // has now added back by its old variant_id.
                     $existing->update([
                         'size' => $variant['size'],
                         'product_quantity' => $variant['product_quantity'],
+                        'is_active' => true,
                     ]);
                     $seenVariantIds[] = $existing->getKey();
 
@@ -173,5 +214,21 @@ class ProductController extends Controller
         Storage::disk('public')->putFileAs('products', $file, $filename);
 
         return $filename;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function paginatedResponse(LengthAwarePaginator $paginator): array
+    {
+        return [
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+        ];
     }
 }

@@ -56,6 +56,8 @@ Route::get('/categories', [CategoryController::class, 'index']);
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:admin')->prefix('admin')->group(function () {
+    Route::get('/products', [AdminProductController::class, 'index']);
+    Route::get('/products/{product}', [AdminProductController::class, 'show']);
     Route::post('/products', [AdminProductController::class, 'store']);
     Route::match(['put', 'patch'], '/products/{product}', [AdminProductController::class, 'update']);
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy']);

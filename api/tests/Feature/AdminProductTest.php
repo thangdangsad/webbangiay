@@ -194,6 +194,62 @@ class AdminProductTest extends TestCase
         ]);
     }
 
+    public function test_admin_product_endpoints_include_inactive_variants(): void
+    {
+        $this->actingAsAdmin();
+        $product = Product::factory()->create();
+        ProductVariant::factory()->create(['product_id' => $product->product_id, 'size' => '40', 'is_active' => true]);
+        $deactivated = ProductVariant::factory()->create(['product_id' => $product->product_id, 'size' => '42', 'is_active' => false]);
+
+        // The public catalog never shows a deactivated size...
+        $publicShow = $this->getJson('/api/products/'.$product->product_id);
+        $publicShow->assertOk();
+        $this->assertNotContains(
+            $deactivated->variant_id,
+            array_column($publicShow->json('data.variants'), 'variant_id'),
+        );
+
+        // ...but the admin endpoints must, so a discontinued size can still
+        // be seen and reactivated from the edit form.
+        $adminIndex = $this->getJson('/api/admin/products');
+        $adminIndex->assertOk();
+        $indexedProduct = collect($adminIndex->json('data'))->firstWhere('product_id', $product->product_id);
+        $this->assertContains($deactivated->variant_id, array_column($indexedProduct['variants'], 'variant_id'));
+
+        $adminShow = $this->getJson('/api/admin/products/'.$product->product_id);
+        $adminShow->assertOk();
+        $this->assertContains(
+            $deactivated->variant_id,
+            array_column($adminShow->json('data.variants'), 'variant_id'),
+        );
+    }
+
+    public function test_re_posting_a_previously_deactivated_variant_id_reactivates_it(): void
+    {
+        $this->actingAsAdmin();
+        $product = Product::factory()->create();
+        $variant = ProductVariant::factory()->create([
+            'product_id' => $product->product_id,
+            'size' => '42',
+            'is_active' => false,
+        ]);
+
+        $response = $this->putJson('/api/admin/products/'.$product->product_id, [
+            'product_name' => $product->product_name,
+            'product_price' => $product->product_price,
+            'variants' => [
+                ['variant_id' => $variant->variant_id, 'size' => $variant->size, 'product_quantity' => 5],
+            ],
+        ]);
+
+        $response->assertOk();
+        $this->assertDatabaseHas('product_variant', [
+            'variant_id' => $variant->variant_id,
+            'is_active' => true,
+            'product_quantity' => 5,
+        ]);
+    }
+
     public function test_admin_can_delete_product(): void
     {
         $this->actingAsAdmin();
