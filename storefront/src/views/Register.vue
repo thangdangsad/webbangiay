@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -34,82 +35,86 @@ async function submit() {
 </script>
 
 <template>
-  <div class="auth-page">
-    <div v-if="success" class="card auth-form success">
-      <h2>Đăng ký thành công</h2>
-      <p>Mời bạn đăng nhập để tiếp tục.</p>
-      <button class="btn btn-primary" @click="router.push({ name: 'login' })">Đến trang đăng nhập</button>
+  <div class="flex justify-center py-8">
+    <div
+      v-if="success"
+      class="w-full max-w-md rounded-xl border border-ink-200 bg-white p-8 text-center shadow-sm"
+    >
+      <h2 class="font-display text-2xl text-ink-900">Đăng ký thành công</h2>
+      <p class="mt-2 text-ink-600">Mời bạn đăng nhập để tiếp tục.</p>
+      <FwbButton
+        class="mt-5 bg-accent-600 hover:bg-accent-700 focus:ring-accent-300"
+        @click="router.push({ name: 'login' })"
+      >
+        Đến trang đăng nhập
+      </FwbButton>
     </div>
 
-    <form v-else class="card auth-form" @submit.prevent="submit">
-      <h2>Đăng ký</h2>
-      <p v-if="errorMessage" class="alert alert-error">{{ errorMessage }}</p>
+    <form
+      v-else
+      class="w-full max-w-md rounded-xl border border-ink-200 bg-white p-8 shadow-sm"
+      @submit.prevent="submit"
+    >
+      <h2 class="mb-5 text-center font-display text-2xl text-ink-900">Đăng ký</h2>
+      <FwbAlert v-if="errorMessage" type="danger" class="mb-4">{{ errorMessage }}</FwbAlert>
 
-      <div class="form-group">
-        <label>Họ tên</label>
-        <input v-model="form.name" type="text" required />
-        <small v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name[0] }}</small>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input v-model="form.email" type="email" required />
-        <small v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email[0] }}</small>
-      </div>
-      <div class="form-group">
-        <label>Số điện thoại</label>
-        <input v-model="form.phone" type="text" required />
-        <small v-if="fieldErrors.phone" class="field-error">{{ fieldErrors.phone[0] }}</small>
-      </div>
-      <div class="form-group">
-        <label>Địa chỉ</label>
-        <input v-model="form.address" type="text" required />
-        <small v-if="fieldErrors.address" class="field-error">{{ fieldErrors.address[0] }}</small>
-      </div>
-      <div class="form-group">
-        <label>Mật khẩu</label>
-        <input v-model="form.password" type="password" required minlength="6" autocomplete="new-password" />
-        <small v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password[0] }}</small>
+      <div class="space-y-4">
+        <FwbInput
+          v-model="form.name"
+          label="Họ tên"
+          required
+          :validation-status="fieldErrors.name ? 'error' : undefined"
+          :validation-message="fieldErrors.name?.[0]"
+        />
+        <FwbInput
+          v-model="form.email"
+          type="email"
+          label="Email"
+          required
+          :validation-status="fieldErrors.email ? 'error' : undefined"
+          :validation-message="fieldErrors.email?.[0]"
+        />
+        <FwbInput
+          v-model="form.phone"
+          label="Số điện thoại"
+          required
+          :validation-status="fieldErrors.phone ? 'error' : undefined"
+          :validation-message="fieldErrors.phone?.[0]"
+        />
+        <FwbInput
+          v-model="form.address"
+          label="Địa chỉ"
+          required
+          :validation-status="fieldErrors.address ? 'error' : undefined"
+          :validation-message="fieldErrors.address?.[0]"
+        />
+        <FwbInput
+          v-model="form.password"
+          type="password"
+          label="Mật khẩu"
+          required
+          minlength="6"
+          autocomplete="new-password"
+          :validation-status="fieldErrors.password ? 'error' : undefined"
+          :validation-message="fieldErrors.password?.[0]"
+        />
       </div>
 
-      <button class="btn btn-primary" type="submit" :disabled="submitting">
+      <FwbButton
+        type="submit"
+        size="lg"
+        class="mt-6 w-full bg-accent-600 hover:bg-accent-700 focus:ring-accent-300"
+        :disabled="submitting"
+      >
         {{ submitting ? 'Đang đăng ký...' : 'Đăng ký' }}
-      </button>
+      </FwbButton>
 
-      <p class="switch-link">
-        Bạn đã có tài khoản? <RouterLink to="/login">Đăng nhập</RouterLink>
+      <p class="mt-4 text-center text-sm text-ink-600">
+        Bạn đã có tài khoản?
+        <RouterLink to="/login" class="font-semibold text-accent-600 hover:text-accent-700">
+          Đăng nhập
+        </RouterLink>
       </p>
     </form>
   </div>
 </template>
-
-<style scoped>
-.auth-page {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0;
-}
-
-.auth-form {
-  width: 100%;
-  max-width: 420px;
-  padding: 32px;
-}
-
-.auth-form h2 {
-  margin-top: 0;
-  text-align: center;
-}
-
-.field-error {
-  color: var(--color-accent);
-}
-
-.switch-link {
-  text-align: center;
-  margin-top: 16px;
-}
-
-.success {
-  text-align: center;
-}
-</style>

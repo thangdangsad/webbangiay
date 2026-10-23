@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { FwbAlert, FwbBadge, FwbButton, FwbSpinner } from 'flowbite-vue'
 
 import { http } from '@/api/client'
 import ProductCard from '@/components/ProductCard.vue'
@@ -56,6 +57,10 @@ function onImgError(e) {
   e.target.src = '/placeholder.svg'
 }
 
+function stepQuantity(delta) {
+  quantity.value = Math.max(1, quantity.value + delta)
+}
+
 async function addToCart() {
   adding.value = true
   addMessage.value = ''
@@ -72,107 +77,92 @@ async function addToCart() {
 
 <template>
   <div>
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <div v-else-if="product" class="product-detail">
-      <div class="gallery">
-        <img :src="imageUrl || '/placeholder.svg'" :alt="product.product_name" @error="onImgError" />
+    <div v-if="loading" class="flex justify-center py-16">
+      <FwbSpinner size="8" />
+    </div>
+    <FwbAlert v-else-if="error" type="danger">{{ error }}</FwbAlert>
+
+    <div v-else-if="product" class="mb-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div class="aspect-square overflow-hidden rounded-xl bg-ink-100">
+        <img
+          :src="imageUrl || '/placeholder.svg'"
+          :alt="product.product_name"
+          class="h-full w-full object-cover"
+          @error="onImgError"
+        />
       </div>
 
-      <div class="details">
-        <h2>{{ product.product_name }}</h2>
-        <div class="prices">
-          <span class="price price-lg">{{ formatPrice(displayPrice) }}</span>
-          <span v-if="hasDiscount" class="price-strike">{{ formatPrice(product.product_price) }}</span>
+      <div>
+        <h1 class="font-display text-2xl text-ink-900 sm:text-3xl">{{ product.product_name }}</h1>
+
+        <div class="mt-3 flex items-baseline gap-3">
+          <span class="font-display text-3xl text-accent-600">{{ formatPrice(displayPrice) }}</span>
+          <span v-if="hasDiscount" class="text-lg text-ink-400 line-through">
+            {{ formatPrice(product.product_price) }}
+          </span>
+          <FwbBadge v-if="hasDiscount" type="danger">Sale</FwbBadge>
         </div>
-        <p v-if="product.size">Size: {{ product.size }}</p>
-        <p v-if="product.category">Danh mục: {{ product.category.category_name }}</p>
 
-        <p v-if="product.product_details" class="description">{{ product.product_details }}</p>
-        <p v-if="product.product_description" class="description">{{ product.product_description }}</p>
+        <dl class="mt-5 space-y-1 text-sm text-ink-600">
+          <div v-if="product.size" class="flex gap-2">
+            <dt class="font-semibold text-ink-800">Size:</dt>
+            <dd>{{ product.size }}</dd>
+          </div>
+          <div v-if="product.category" class="flex gap-2">
+            <dt class="font-semibold text-ink-800">Danh mục:</dt>
+            <dd>{{ product.category.category_name }}</dd>
+          </div>
+        </dl>
 
-        <div class="add-to-cart">
-          <input v-model.number="quantity" type="number" min="1" />
-          <button class="btn btn-primary" :disabled="adding" @click="addToCart">
+        <p v-if="product.product_details" class="mt-4 leading-relaxed text-ink-600">
+          {{ product.product_details }}
+        </p>
+        <p v-if="product.product_description" class="mt-2 leading-relaxed text-ink-600">
+          {{ product.product_description }}
+        </p>
+
+        <div class="mt-6 flex items-center gap-4">
+          <div class="flex items-center rounded-lg border border-ink-300">
+            <button
+              type="button"
+              class="px-3 py-2 text-lg text-ink-600 hover:text-accent-600"
+              @click="stepQuantity(-1)"
+            >
+              −
+            </button>
+            <input
+              v-model.number="quantity"
+              type="number"
+              min="1"
+              class="w-12 border-x border-ink-300 py-2 text-center focus:outline-none"
+            />
+            <button
+              type="button"
+              class="px-3 py-2 text-lg text-ink-600 hover:text-accent-600"
+              @click="stepQuantity(1)"
+            >
+              +
+            </button>
+          </div>
+          <FwbButton
+            size="lg"
+            :disabled="adding"
+            class="flex-1 bg-accent-600 hover:bg-accent-700 focus:ring-accent-300 sm:flex-none"
+            @click="addToCart"
+          >
             {{ adding ? 'Đang thêm...' : 'Thêm vào giỏ' }}
-          </button>
+          </FwbButton>
         </div>
-        <p v-if="addMessage" class="alert alert-success">{{ addMessage }}</p>
+
+        <FwbAlert v-if="addMessage" type="success" class="mt-4">{{ addMessage }}</FwbAlert>
       </div>
     </div>
 
-    <section v-if="similar.length" class="similar-section">
-      <h3>Sản phẩm tương tự</h3>
-      <div class="product-grid">
+    <section v-if="similar.length">
+      <h3 class="mb-4 font-display text-xl text-ink-900">Sản phẩm tương tự</h3>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         <ProductCard v-for="p in similar" :key="p.product_id" :product="p" />
       </div>
     </section>
   </div>
 </template>
-
-<style scoped>
-.product-detail {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 32px;
-  margin-bottom: 40px;
-}
-
-.gallery {
-  background: #f1f3f5;
-  border-radius: 8px;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.gallery img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.prices {
-  margin: 10px 0;
-}
-
-.price-lg {
-  font-size: 22px;
-}
-
-.description {
-  color: var(--color-muted);
-  line-height: 1.6;
-}
-
-.add-to-cart {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.add-to-cart input {
-  width: 70px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 9px;
-}
-
-.similar-section {
-  margin-top: 30px;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-@media (max-width: 720px) {
-  .product-detail {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

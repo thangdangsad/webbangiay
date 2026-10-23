@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
 
 import { useAuthStore } from '@/stores/auth'
 import { useCartStore } from '@/stores/cart'
@@ -36,51 +37,46 @@ async function submit() {
 </script>
 
 <template>
-  <div class="auth-page">
-    <form class="card auth-form" @submit.prevent="submit">
-      <h2>Đăng nhập</h2>
-      <p v-if="errorMessage" class="alert alert-error">{{ errorMessage }}</p>
+  <div class="flex justify-center py-8">
+    <form
+      class="w-full max-w-md rounded-xl border border-ink-200 bg-white p-8 shadow-sm"
+      @submit.prevent="submit"
+    >
+      <h2 class="mb-5 text-center font-display text-2xl text-ink-900">Đăng nhập</h2>
+      <FwbAlert v-if="errorMessage" type="danger" class="mb-4">{{ errorMessage }}</FwbAlert>
 
-      <div class="form-group">
-        <label>Email</label>
-        <input v-model="form.email" type="email" required autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label>Mật khẩu</label>
-        <input v-model="form.password" type="password" required autocomplete="current-password" />
+      <div class="space-y-4">
+        <FwbInput
+          v-model="form.email"
+          type="email"
+          label="Email"
+          required
+          autocomplete="username"
+        />
+        <FwbInput
+          v-model="form.password"
+          type="password"
+          label="Mật khẩu"
+          required
+          autocomplete="current-password"
+        />
       </div>
 
-      <button class="btn btn-primary" type="submit" :disabled="submitting">
+      <FwbButton
+        type="submit"
+        size="lg"
+        class="mt-6 w-full bg-accent-600 hover:bg-accent-700 focus:ring-accent-300"
+        :disabled="submitting"
+      >
         {{ submitting ? 'Đang đăng nhập...' : 'Đăng nhập' }}
-      </button>
+      </FwbButton>
 
-      <p class="switch-link">
-        Bạn chưa có tài khoản? <RouterLink to="/register">Đăng ký</RouterLink>
+      <p class="mt-4 text-center text-sm text-ink-600">
+        Bạn chưa có tài khoản?
+        <RouterLink to="/register" class="font-semibold text-accent-600 hover:text-accent-700">
+          Đăng ký
+        </RouterLink>
       </p>
     </form>
   </div>
 </template>
-
-<style scoped>
-.auth-page {
-  display: flex;
-  justify-content: center;
-  padding: 40px 0;
-}
-
-.auth-form {
-  width: 100%;
-  max-width: 420px;
-  padding: 32px;
-}
-
-.auth-form h2 {
-  margin-top: 0;
-  text-align: center;
-}
-
-.switch-link {
-  text-align: center;
-  margin-top: 16px;
-}
-</style>

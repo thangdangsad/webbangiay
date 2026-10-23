@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { FwbAlert, FwbSpinner } from 'flowbite-vue'
 
 import { http } from '@/api/client'
 import ProductCard from '@/components/ProductCard.vue'
@@ -34,23 +35,20 @@ watch(
 
 <template>
   <div>
-    <h2 class="page-title">Kết quả tìm kiếm: "{{ query }}"</h2>
+    <h2 class="mb-5 font-display text-2xl text-ink-900">Kết quả tìm kiếm: "{{ query }}"</h2>
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <p v-else-if="products.length === 0" class="empty-state">
-      Không tìm thấy sản phẩm phù hợp.
-    </p>
-    <div v-else class="product-grid">
+    <div v-if="loading" class="flex justify-center py-16">
+      <FwbSpinner size="8" />
+    </div>
+    <FwbAlert v-else-if="error" type="danger">{{ error }}</FwbAlert>
+    <div v-else-if="products.length === 0" class="py-16 text-center text-ink-400">
+      <p>Không tìm thấy sản phẩm phù hợp.</p>
+      <RouterLink to="/" class="mt-2 inline-block font-semibold text-accent-600 hover:text-accent-700">
+        Về trang chủ
+      </RouterLink>
+    </div>
+    <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       <ProductCard v-for="p in products" :key="p.product_id" :product="p" />
     </div>
   </div>
 </template>
-
-<style scoped>
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-</style>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { FwbBadge } from 'flowbite-vue'
 
 import { formatPrice, productImageUrl } from '@/utils/format'
 
@@ -24,68 +25,29 @@ function onImgError(e) {
 </script>
 
 <template>
-  <RouterLink :to="`/product/${product.product_id}`" class="card product-card">
-    <div class="thumb">
-      <img :src="imageUrl || '/placeholder.svg'" :alt="product.product_name" @error="onImgError" />
+  <RouterLink
+    :to="`/product/${product.product_id}`"
+    class="group block overflow-hidden rounded-xl border border-ink-200 bg-white transition hover:-translate-y-1 hover:shadow-lg hover:shadow-ink-900/10"
+  >
+    <div class="relative aspect-square overflow-hidden bg-ink-100">
+      <img
+        :src="imageUrl || '/placeholder.svg'"
+        :alt="product.product_name"
+        class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+        @error="onImgError"
+      />
+      <FwbBadge v-if="hasDiscount" type="danger" class="absolute left-2 top-2">Sale</FwbBadge>
     </div>
-    <div class="info">
-      <h4 class="name">{{ product.product_name }}</h4>
-      <div class="prices">
-        <span class="price">{{ formatPrice(displayPrice) }}</span>
-        <span v-if="hasDiscount" class="price-strike">{{ formatPrice(product.product_price) }}</span>
+    <div class="p-3">
+      <h4 class="mb-2 line-clamp-2 h-10 text-sm font-semibold text-ink-800">
+        {{ product.product_name }}
+      </h4>
+      <div class="flex items-baseline gap-2">
+        <span class="font-display text-accent-600">{{ formatPrice(displayPrice) }}</span>
+        <span v-if="hasDiscount" class="text-sm text-ink-400 line-through">
+          {{ formatPrice(product.product_price) }}
+        </span>
       </div>
     </div>
   </RouterLink>
 </template>
-
-<style scoped>
-.product-card {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-  overflow: hidden;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.product-card:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
-.thumb {
-  background: #f1f3f5;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.info {
-  padding: 12px;
-}
-
-.name {
-  margin: 0 0 8px;
-  font-size: 15px;
-  font-weight: 600;
-  height: 40px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.prices {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-}
-</style>

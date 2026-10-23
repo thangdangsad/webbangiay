@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { FwbAlert, FwbButton, FwbSpinner } from 'flowbite-vue'
 
 import { http } from '@/api/client'
 import ProductCard from '@/components/ProductCard.vue'
@@ -61,37 +62,25 @@ function goToPage(p) {
 
 <template>
   <div>
-    <h2 class="page-title">{{ categoryName || 'Danh mục sản phẩm' }}</h2>
+    <h2 class="mb-5 font-display text-2xl text-ink-900">{{ categoryName || 'Danh mục sản phẩm' }}</h2>
 
-    <p v-if="loading">Đang tải...</p>
-    <p v-else-if="error" class="alert alert-error">{{ error }}</p>
-    <p v-else-if="products.length === 0" class="empty-state">Chưa có sản phẩm trong danh mục này.</p>
+    <div v-if="loading" class="flex justify-center py-16">
+      <FwbSpinner size="8" />
+    </div>
+    <FwbAlert v-else-if="error" type="danger">{{ error }}</FwbAlert>
+    <p v-else-if="products.length === 0" class="py-16 text-center text-ink-400">
+      Chưa có sản phẩm trong danh mục này.
+    </p>
     <template v-else>
-      <div class="product-grid">
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         <ProductCard v-for="p in products" :key="p.product_id" :product="p" />
       </div>
 
-      <div v-if="lastPage > 1" class="pagination">
-        <button class="btn btn-outline" :disabled="page <= 1" @click="goToPage(page - 1)">Trước</button>
-        <span>Trang {{ page }} / {{ lastPage }}</span>
-        <button class="btn btn-outline" :disabled="page >= lastPage" @click="goToPage(page + 1)">Sau</button>
+      <div v-if="lastPage > 1" class="mt-8 flex items-center justify-center gap-4">
+        <FwbButton outline color="dark" :disabled="page <= 1" @click="goToPage(page - 1)">Trước</FwbButton>
+        <span class="text-sm text-ink-500">Trang {{ page }} / {{ lastPage }}</span>
+        <FwbButton outline color="dark" :disabled="page >= lastPage" @click="goToPage(page + 1)">Sau</FwbButton>
       </div>
     </template>
   </div>
 </template>
-
-<style scoped>
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  margin-top: 28px;
-}
-</style>
