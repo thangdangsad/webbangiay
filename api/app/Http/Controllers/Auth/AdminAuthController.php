@@ -2,19 +2,28 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Auth\Concerns\IssuesAuthTokens;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
+    use IssuesAuthTokens;
+
+    private const GUARD = 'admin';
+
+    private const REFRESH_PATH = '/api/admin/refresh';
+
     /**
      * Equivalent of admin/loginadmin.php. Lazily migrates md5 -> bcrypt.
      * No admin "register" endpoint — legacy admin/register.php is dropped;
      * staff accounts are created through admin CRUD (later phase).
+     *
+     * Issues an access token (returned in the body) and a refresh token
+     * (HttpOnly cookie) — see IssuesAuthTokens. No session login.
      */
     public function login(Request $request): JsonResponse
     {
@@ -31,22 +40,28 @@ class AdminAuthController extends Controller
             ])->status(401);
         }
 
-        $request->session()->regenerate();
-        Auth::guard('admin')->login($staff);
+        return $this->tokenResponse(self::GUARD, $staff, self::REFRESH_PATH, $staff);
+    }
 
-        return response()->json([
-            'data' => $staff,
-        ]);
+    /**
+     * Exchange a still-valid refresh-token cookie for a fresh access +
+     * refresh token pair. Called by the SPA when a request comes back 401
+     * (access token expired) or on app load to restore the session.
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        return $this->handleRefresh(
+            $request,
+            self::GUARD,
+            self::REFRESH_PATH,
+            Staff::class,
+            fn (Staff $staff) => $staff,
+        );
     }
 
     public function logout(Request $request): JsonResponse
     {
-        Auth::guard('admin')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return response()->json(null, 204);
+        return $this->revokeTokens($request, self::GUARD, self::REFRESH_PATH);
     }
 
     public function me(Request $request): JsonResponse

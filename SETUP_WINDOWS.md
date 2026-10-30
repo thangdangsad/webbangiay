@@ -1,12 +1,12 @@
-# Cài đặt & chạy project trên Windows (không dùng Docker)
+# Cài đặt & chạy project trên Windows
 
-Cách này cài PHP, Composer, MySQL **trực tiếp lên Windows**, không qua Docker.
+PHP + Composer chạy **trực tiếp trên Windows** (không qua Docker). MySQL và
+Redis chạy trong **Docker Desktop** (chỉ 2 service hạ tầng, không có container
+app Laravel) — xem mục 4.
 
 ## 1. Cài PHP + Composer
 
-Project **không dùng MySQL cài local** — database thật chạy trên **TiDB Cloud** (xem mục 4), nên bạn chỉ cần cài PHP + Composer, không cần Laragon hay MySQL Installer.
-
-Cách nhanh nhất là dùng [Laragon](https://laragon.org/download/) (chỉ để lấy PHP + Composer có sẵn, phần MySQL đi kèm Laragon thì bỏ qua, không cần Start):
+Cách nhanh nhất là dùng [Laragon](https://laragon.org/download/) (chỉ để lấy PHP + Composer có sẵn, phần MySQL đi kèm Laragon thì bỏ qua, không cần Start — MySQL thật chạy trong Docker, xem mục 4):
 
 1. Tải **Laragon Full**: https://laragon.org/download/
 2. Cài đặt (Next liên tục là xong).
@@ -15,7 +15,7 @@ Cách nhanh nhất là dùng [Laragon](https://laragon.org/download/) (chỉ đ�
    php -v
    composer -V
    ```
-4. Không cần bấm "Start All" / không cần khởi động MySQL của Laragon — project kết nối thẳng tới database trên cloud.
+4. Không cần bấm "Start All" / không cần khởi động MySQL của Laragon — MySQL thật của project chạy trong Docker (mục 4), không phải MySQL đi kèm Laragon.
 
 > Nếu không muốn dùng Laragon, có thể cài riêng lẻ: PHP tại https://windows.php.net/download/ (bản Thread Safe, >= 8.2), Composer tại https://getcomposer.org/download/. Không cần cài MySQL ở bước này.
 
@@ -39,34 +39,48 @@ copy .env.example .env
 php artisan key:generate
 ```
 
-## 4. Database: TiDB Cloud (không cần tạo/cài gì local)
+## 4. Database + Redis: Docker Desktop (chỉ 2 service, không có container app)
 
-Database dùng chung cho cả team đã có sẵn trên **TiDB Cloud** (MySQL-compatible, serverless) — không cần cài MySQL, không cần tạo database mới, chỉ cần config `.env` để kết nối tới.
+MySQL và Redis chạy local qua Docker — không cần cài MySQL/Redis trực tiếp
+lên Windows. Cần [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+đã cài và đang chạy.
 
-Xin thông tin kết nối (host/user/password) từ người quản lý project (không ghi trực tiếp trong file này vì đây là file commit lên git). Nếu muốn xem bằng GUI, có thể dùng HeidiSQL/TablePlus/DBeaver/IntelliJ Database tool, kết nối qua driver MySQL tới host TiDB Cloud, bật SSL.
+```bash
+cd api
+docker compose up -d mysql redis
+```
 
-## 5. Cấu hình `.env` kết nối database
+Lệnh này dùng sẵn `api/compose.yaml` (Laravel Sail) nhưng chỉ khởi động 2
+service `mysql` và `redis`, publish port ra host (`3306`, `6379`) — **không**
+build/chạy container app Laravel (PHP vẫn chạy trực tiếp trên Windows, xem
+mục 7). Dùng `docker compose ps` để kiểm tra 2 container đang `Up (healthy)`,
+và `docker compose down` khi muốn tắt.
 
-Mở file `api/.env` (copy từ `.env.example` nếu chưa có), sửa phần DB theo thông tin TiDB Cloud được cấp:
+## 5. Cấu hình `.env` kết nối database + Redis
+
+Mở file `api/.env` (copy từ `.env.example` nếu chưa có) — giá trị mặc định
+trong `.env.example` đã đúng cho setup này (`DB_HOST=127.0.0.1`,
+`REDIS_HOST=127.0.0.1`, `REDIS_CLIENT=predis`), không cần sửa gì thêm:
 
 ```env
 DB_CONNECTION=mysql
-DB_HOST=gateway01.ap-southeast-1.prod.aws.tidbcloud.com
-DB_PORT=4000
-DB_DATABASE=<tên-database-được-cấp>
-DB_USERNAME=<username-được-cấp>
-DB_PASSWORD=<password-được-cấp>
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
 ```
 
-TiDB Cloud yêu cầu kết nối qua **TLS/SSL**, cần chỉ Laravel tới file CA cert gốc hệ thống. Trên Windows (dùng Laragon), thêm dòng:
+`REDIS_CLIENT=predis` là client Redis thuần PHP — không cần cài/build
+extension `phpredis`, tiện cho Windows. Access token (login) và refresh
+token đều lưu trong Redis (không lưu DB) — xem
+`api/app/Services/Auth/TokenBroker.php`.
 
-```env
-MYSQL_ATTR_SSL_CA=C:\laragon\bin\php\<phiên-bản-php>\extras\ssl\cacert.pem
-```
-
-(Nếu không có sẵn file CA cert, tải bộ CA bundle của Mozilla tại https://curl.se/ca/cacert.pem, lưu vào máy rồi chỉ đường dẫn tới đó.)
-
-Sau khi sửa `.env`, chạy `php artisan config:clear` để Laravel đọc lại config mới.
+Sau khi sửa `.env` (nếu có), chạy `php artisan config:clear` để Laravel đọc lại config mới.
 
 ## 6. Chạy migration + test
 
@@ -99,13 +113,15 @@ Mặc định chạy ở `http://localhost:5180`. Nếu port bị trùng, đổi
 
 ## 9. Thứ tự khởi động mỗi lần làm việc
 
-1. Trong `api/`: `php artisan serve` (không cần bật MySQL local — DB đã chạy sẵn trên TiDB Cloud).
-2. Trong `storefront/`: `npm run dev`
-3. Mở trình duyệt: `http://localhost:5180`
+1. Mở Docker Desktop (nếu chưa chạy), rồi trong `api/`: `docker compose up -d mysql redis` (bỏ qua nếu 2 container còn đang chạy từ lần trước).
+2. Trong `api/`: `php artisan serve`
+3. Trong `storefront/`: `npm run dev`
+4. Mở trình duyệt: `http://localhost:5180`
 
 ## Sự cố thường gặp
 
 - **`php` hoặc `composer` không nhận lệnh**: PHP/Composer của Laragon chưa được thêm vào PATH — mở lại terminal từ trong Laragon (nó tự set PATH), hoặc tự thêm đường dẫn `C:\laragon\bin\php\php-x.x.x` vào biến môi trường PATH của Windows.
-- **`php artisan migrate`/`serve` báo lỗi kết nối DB** (ví dụ "SQLSTATE[HY000] [2002]" hoặc lỗi SSL): kiểm tra `.env` đã đúng `DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` theo thông tin được cấp chưa, đường dẫn `MYSQL_ATTR_SSL_CA` có tồn tại trên máy không, rồi chạy `php artisan config:clear`. Cũng kiểm tra mạng/firewall công ty có chặn kết nối ra ngoài cổng `4000` không — TiDB Cloud yêu cầu kết nối Internet, không chạy được offline.
+- **`php artisan migrate`/`serve` báo lỗi kết nối DB** (ví dụ "SQLSTATE[HY000] [2002] Connection refused"): MySQL trong Docker chưa chạy — `docker compose up -d mysql redis` trong `api/`, đợi vài giây rồi thử lại. Kiểm tra `docker compose ps` thấy `mysql`/`redis` là `Up (healthy)`.
+- **Lỗi kết nối Redis** (login báo lỗi 500, hoặc session không giữ được): kiểm tra Redis đã chạy (`docker compose ps`) và `.env` có `REDIS_HOST=127.0.0.1`, `REDIS_CLIENT=predis`.
 - **Thiếu extension PHP** (ví dụ lỗi "pdo_mysql" hoặc "mbstring"): Laragon → Menu → PHP → php.ini, mở file, bỏ dấu `;` trước dòng `extension=pdo_mysql`, `extension=mbstring`, `extension=fileinfo`, lưu lại rồi khởi động lại Apache/Nginx trong Laragon.
 - **Port 8000/5180 đã bị chiếm**: đổi port tương ứng (`php artisan serve --port=8001`, hoặc sửa `storefront/vite.config.js`).

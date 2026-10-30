@@ -168,7 +168,6 @@ class CartTest extends TestCase
             'password' => 'secret123',
         ]);
         $login->assertOk();
-        $this->continueSessionFrom($login);
 
         $this->assertDatabaseHas('cart', [
             'variant_id' => $variant->variant_id,
@@ -176,7 +175,7 @@ class CartTest extends TestCase
             'guest_token' => null,
         ]);
 
-        $cart = $this->getJson('/api/cart');
+        $cart = $this->withHeaders($this->bearerHeaderFrom($login))->getJson('/api/cart');
         $cart->assertOk();
         $this->assertCount(1, $cart->json('data'));
         $this->assertSame($variant->variant_id, $cart->json('data.0.variant_id'));

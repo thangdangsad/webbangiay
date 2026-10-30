@@ -45,13 +45,17 @@ return [
             'provider' => 'users',
         ],
 
+        // Bearer access-token guards, resolved from Redis — see
+        // App\Providers\AuthServiceProvider and App\Services\Auth\TokenBroker.
+        // Not session-based: login issues an access token (short-lived) and
+        // a refresh token (HttpOnly cookie), neither stored in the database.
         'customer' => [
-            'driver' => 'session',
+            'driver' => 'redis-token:customer',
             'provider' => 'customers',
         ],
 
         'admin' => [
-            'driver' => 'session',
+            'driver' => 'redis-token:admin',
             'provider' => 'staff',
         ],
     ],

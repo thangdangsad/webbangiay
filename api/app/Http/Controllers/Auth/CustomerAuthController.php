@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Auth\Concerns\IssuesAuthTokens;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerAccount;
 use App\Services\CartResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class CustomerAuthController extends Controller
 {
+    use IssuesAuthTokens;
+
+    private const GUARD = 'customer';
+
+    private const REFRESH_PATH = '/api/refresh';
+
     /**
      * Equivalent of frontend/topbar.php's `register` branch
      * (register_name/register_email/register_phone/register_address/register_password).
@@ -46,6 +52,9 @@ class CustomerAuthController extends Controller
      * admin-via-customer-table hack. Lazily migrates plaintext -> bcrypt.
      * Also merges any session-scoped guest cart into the now-authenticated
      * customer's account (see CartResolver::mergeGuestCartIntoCustomer()).
+     *
+     * Issues an access token (returned in the body) and a refresh token
+     * (HttpOnly cookie) — see IssuesAuthTokens. No session login.
      */
     public function login(Request $request, CartResolver $cartResolver): JsonResponse
     {
@@ -62,23 +71,30 @@ class CustomerAuthController extends Controller
             ])->status(401);
         }
 
-        $request->session()->regenerate();
-        Auth::guard('customer')->login($customer);
         $cartResolver->mergeGuestCartIntoCustomer($request, $customer);
 
-        return response()->json([
-            'data' => $customer,
-        ]);
+        return $this->tokenResponse(self::GUARD, $customer, self::REFRESH_PATH, $customer);
+    }
+
+    /**
+     * Exchange a still-valid refresh-token cookie for a fresh access +
+     * refresh token pair. Called by the SPA when a request comes back 401
+     * (access token expired) or on app load to restore the session.
+     */
+    public function refresh(Request $request): JsonResponse
+    {
+        return $this->handleRefresh(
+            $request,
+            self::GUARD,
+            self::REFRESH_PATH,
+            CustomerAccount::class,
+            fn (CustomerAccount $customer) => $customer,
+        );
     }
 
     public function logout(Request $request): JsonResponse
     {
-        Auth::guard('customer')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return response()->json(null, 204);
+        return $this->revokeTokens($request, self::GUARD, self::REFRESH_PATH);
     }
 
     public function me(Request $request): JsonResponse

@@ -6,18 +6,25 @@ use App\Models\CustomerAccount;
 use App\Models\Staff;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /**
- * These tests simulate real requests from the storefront/admin-panel SPAs:
- * a Referer header matching a configured Sanctum stateful domain is required
- * for EnsureFrontendRequestsAreStateful to turn on session/cookie auth at all
- * (see config/sanctum.php `stateful` + config/cors.php). CSRF is disabled here
- * because it's Sanctum/Laravel's own well-tested mechanism, not app logic —
- * what we're verifying is register/login/logout/me and guard isolation.
+ * These tests simulate real requests from the storefront/admin-panel SPAs.
+ * A Referer header matching a configured Sanctum stateful domain is
+ * required for EnsureFrontendRequestsAreStateful to start a session at all
+ * (needed for CartResolver's guest-cart merge on login, see
+ * config/sanctum.php `stateful` + config/cors.php). CSRF is disabled here
+ * because it's Sanctum/Laravel's own well-tested mechanism, not app logic.
+ *
+ * Login/logout/me/refresh themselves are NOT session-based: login returns
+ * an access token (Bearer, short-lived) and sets a refresh token as an
+ * HttpOnly cookie (long-lived) — both opaque strings stored in Redis via
+ * App\Services\Auth\TokenBroker, never in the database. See
+ * App\Http\Controllers\Auth\Concerns\IssuesAuthTokens.
  */
 class AuthTest extends TestCase
 {
@@ -29,16 +36,29 @@ class AuthTest extends TestCase
 
         $this->withHeader('Referer', 'http://localhost:5180/');
         $this->withoutMiddleware(ValidateCsrfToken::class);
+
+        // postJson()/getJson() only send cookies when this is set (mirrors
+        // axios' `withCredentials: true` — see storefront/admin-panel's
+        // api/client.js) — needed so the refresh-token cookie round-trips.
+        $this->withCredentials();
     }
 
     /**
-     * Carries the session cookie set by $response into the next request made
-     * through $this, simulating the browser echoing the cookie back.
+     * Carries the refresh-token cookie set by $response (login/refresh)
+     * into the next request made through $this.
      */
-    private function continueSessionFrom(TestResponse $response): void
+    private function continueRefreshCookieFrom(TestResponse $response, string $cookieName): void
     {
-        $cookie = $response->getCookie(config('session.cookie'), false);
+        $cookie = $response->getCookie($cookieName, false);
         $this->withUnencryptedCookie($cookie->getName(), $cookie->getValue());
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function bearerHeader(TestResponse $response): array
+    {
+        return ['Authorization' => 'Bearer '.$response->json('access_token')];
     }
 
     public function test_customer_can_register(): void
@@ -63,7 +83,7 @@ class AuthTest extends TestCase
         $this->assertTrue(Hash::check('secret123', $customer->user_password));
     }
 
-    public function test_customer_can_login_then_access_me(): void
+    public function test_customer_can_login_then_access_me_with_access_token(): void
     {
         CustomerAccount::create([
             'user_name' => 'Nguyen Van B',
@@ -79,9 +99,11 @@ class AuthTest extends TestCase
             'password' => 'secret123',
         ]);
         $login->assertOk();
-        $this->continueSessionFrom($login);
+        $this->assertIsString($login->json('access_token'));
+        $this->assertIsInt($login->json('expires_in'));
+        $login->assertCookie('customer_refresh_token');
 
-        $me = $this->getJson('/api/me');
+        $me = $this->withHeaders($this->bearerHeader($login))->getJson('/api/me');
         $me->assertOk();
         $me->assertJsonPath('data.user_email', 'customer-b@example.com');
     }
@@ -137,6 +159,88 @@ class AuthTest extends TestCase
         $this->getJson('/api/me')->assertStatus(401);
     }
 
+    public function test_customer_can_refresh_access_token_using_cookie(): void
+    {
+        $customer = CustomerAccount::create([
+            'user_name' => 'Nguyen Van E',
+            'user_email' => 'customer-e@example.com',
+            'user_phone' => '0900000006',
+            'user_address' => '3 Le Loi, HCMC',
+            'user_password' => Hash::make('secret123'),
+            'user_code' => 0,
+        ]);
+
+        $login = $this->postJson('/api/login', [
+            'email' => 'customer-e@example.com',
+            'password' => 'secret123',
+        ]);
+        $login->assertOk();
+        $this->continueRefreshCookieFrom($login, 'customer_refresh_token');
+
+        $refresh = $this->postJson('/api/refresh');
+        $refresh->assertOk();
+        $refresh->assertJsonPath('data.user_id', $customer->user_id);
+        $this->assertNotSame($login->json('access_token'), $refresh->json('access_token'));
+
+        $me = $this->withHeaders($this->bearerHeader($refresh))->getJson('/api/me');
+        $me->assertOk();
+        $me->assertJsonPath('data.user_email', 'customer-e@example.com');
+    }
+
+    public function test_refresh_token_is_single_use(): void
+    {
+        CustomerAccount::create([
+            'user_name' => 'Nguyen Van F',
+            'user_email' => 'customer-f@example.com',
+            'user_phone' => '0900000007',
+            'user_address' => '4 Le Loi, HCMC',
+            'user_password' => Hash::make('secret123'),
+            'user_code' => 0,
+        ]);
+
+        $login = $this->postJson('/api/login', [
+            'email' => 'customer-f@example.com',
+            'password' => 'secret123',
+        ]);
+        $this->continueRefreshCookieFrom($login, 'customer_refresh_token');
+
+        $this->postJson('/api/refresh')->assertOk();
+
+        // the cookie in $this is still the OLD (already-rotated) refresh
+        // token — replaying it must fail.
+        $this->postJson('/api/refresh')->assertStatus(401);
+    }
+
+    public function test_customer_logout_revokes_access_and_refresh_tokens(): void
+    {
+        CustomerAccount::create([
+            'user_name' => 'Nguyen Van G',
+            'user_email' => 'customer-g@example.com',
+            'user_phone' => '0900000008',
+            'user_address' => '5 Le Loi, HCMC',
+            'user_password' => Hash::make('secret123'),
+            'user_code' => 0,
+        ]);
+
+        $login = $this->postJson('/api/login', [
+            'email' => 'customer-g@example.com',
+            'password' => 'secret123',
+        ]);
+        $this->continueRefreshCookieFrom($login, 'customer_refresh_token');
+
+        $this->withHeaders($this->bearerHeader($login))->postJson('/api/logout')->assertNoContent();
+
+        // RequestGuard caches the resolved user on itself for the lifetime
+        // of the request it was built with, and that guard instance is
+        // reused across simulated requests within a single test — forget
+        // it so the next request re-resolves from the (now revoked) token
+        // instead of returning the cached pre-logout user.
+        Auth::forgetGuards();
+
+        $this->withHeaders($this->bearerHeader($login))->getJson('/api/me')->assertStatus(401);
+        $this->postJson('/api/refresh')->assertStatus(401);
+    }
+
     public function test_admin_can_login_independently_via_admin_guard(): void
     {
         Staff::create([
@@ -153,9 +257,9 @@ class AuthTest extends TestCase
             'password' => 'adminpass123',
         ]);
         $login->assertOk();
-        $this->continueSessionFrom($login);
+        $login->assertCookie('admin_refresh_token');
 
-        $me = $this->getJson('/api/admin/me');
+        $me = $this->withHeaders($this->bearerHeader($login))->getJson('/api/admin/me');
         $me->assertOk();
         $me->assertJsonPath('data.user_email', 'admin-a@example.com');
     }
@@ -184,7 +288,7 @@ class AuthTest extends TestCase
         $this->assertTrue(Hash::check('legacy-md5-pass', $stored));
     }
 
-    public function test_customer_session_cannot_access_admin_me(): void
+    public function test_customer_access_token_cannot_access_admin_me(): void
     {
         CustomerAccount::create([
             'user_name' => 'Nguyen Van D',
@@ -200,13 +304,12 @@ class AuthTest extends TestCase
             'password' => 'secret123',
         ]);
         $login->assertOk();
-        $this->continueSessionFrom($login);
 
         // authenticated as customer, but hitting the admin-guarded route
-        $this->getJson('/api/admin/me')->assertStatus(401);
+        $this->withHeaders($this->bearerHeader($login))->getJson('/api/admin/me')->assertStatus(401);
     }
 
-    public function test_admin_session_cannot_access_customer_me(): void
+    public function test_admin_access_token_cannot_access_customer_me(): void
     {
         Staff::create([
             'user_name' => 'Admin Two',
@@ -222,9 +325,8 @@ class AuthTest extends TestCase
             'password' => 'adminpass123',
         ]);
         $login->assertOk();
-        $this->continueSessionFrom($login);
 
         // authenticated as admin, but hitting the customer-guarded route
-        $this->getJson('/api/me')->assertStatus(401);
+        $this->withHeaders($this->bearerHeader($login))->getJson('/api/me')->assertStatus(401);
     }
 }
