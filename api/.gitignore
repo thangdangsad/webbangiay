@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+/data_mysql
+/storage/app/public/*
+!/storage/app/public/.gitkeep

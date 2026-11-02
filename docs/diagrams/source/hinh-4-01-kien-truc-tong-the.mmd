@@ -1,0 +1,38 @@
+flowchart TB
+  subgraph CLIENT["Người dùng"]
+    U1["Khách hàng"]
+    U2["Nhân viên / Quản trị"]
+  end
+  subgraph FE["Frontend"]
+    NUXT["Storefront - Nuxt 3 SSR<br/>localhost:3000"]
+    ADM["Admin - Vue 3 SPA<br/>localhost:5173"]
+  end
+  subgraph BE["Backend - Laravel REST API (localhost:8000)"]
+    MW["Middleware: CORS - Rate limit - JWT Guard"]
+    MOD["Các module: Auth - Catalog - Inventory - Cart<br/>Order - Payment - Promotion - Report - CMS"]
+    Q["Queue Worker - Horizon<br/>và Scheduler"]
+  end
+  subgraph DATA["Lưu trữ dữ liệu"]
+    MY[("MySQL 8")]
+    RA[("Redis - auth<br/>phiên, refresh token")]
+    RC[("Redis - cache,<br/>queue, lock")]
+    FS["Local storage<br/>storage/app/public<br/>ảnh, logo"]
+  end
+  subgraph EXT["Dịch vụ bên ngoài"]
+    MOMO["Cổng thanh toán MoMo"]
+    MAIL["Email / SMS"]
+    SHIP["Đơn vị vận chuyển"]
+  end
+  U1 --> NUXT
+  U2 --> ADM
+  NUXT -->|"REST JSON + Bearer JWT"| MW
+  ADM -->|"REST JSON + Bearer JWT"| MW
+  MW --> MOD
+  MOD --> MY
+  MOD --> RA
+  MOD --> RC
+  MOD --> FS
+  MOD --> Q
+  MOD <-->|"Tạo giao dịch / IPN"| MOMO
+  Q --> MAIL
+  MOD -.->|"Vận đơn"| SHIP

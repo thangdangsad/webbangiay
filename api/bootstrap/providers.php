@@ -1,9 +1,7 @@
 <?php
 
-use App\Providers\AppServiceProvider;
-use App\Providers\AuthServiceProvider;
-
 return [
-    AppServiceProvider::class,
-    AuthServiceProvider::class,
+    App\Modules\Auth\AuthServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+    App\Providers\HorizonServiceProvider::class,
 ];

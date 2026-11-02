@@ -1,0 +1,37 @@
+sequenceDiagram
+autonumber
+actor KH as Khách hàng
+participant FE as Nuxt
+participant API as Laravel API
+participant DB as MySQL
+participant MM as MoMo
+KH->>FE: Chọn Ví MoMo, bấm Đặt hàng
+FE->>API: POST /orders (payment_method = momo)
+API->>DB: Tạo đơn (unpaid) và giữ tồn kho
+API-->>FE: 201 mã đơn
+FE->>API: POST /payments/momo/create
+API->>API: Tạo orderId, requestId, ký HMAC SHA256
+API->>MM: POST /v2/gateway/api/create
+MM-->>API: payUrl, qrCodeUrl, deeplink
+API->>DB: Lưu payments (pending, hết hạn sau 15 phút)
+API-->>FE: pay_url / qr
+FE-->>KH: Chuyển sang MoMo hoặc hiển thị mã QR
+KH->>MM: Xác nhận thanh toán trên app MoMo
+par IPN (server to server)
+  MM->>API: POST /payments/momo/ipn
+  API->>API: Xác thực chữ ký, so khớp số tiền và orderId
+  alt resultCode = 0
+    API->>DB: payments = paid, đơn = confirmed
+  else Thanh toán thất bại
+    API->>DB: payments = failed
+  end
+  API-->>MM: 204 No Content
+and Khách quay lại website
+  MM-->>FE: Redirect về trang kết quả
+  loop Hỏi trạng thái mỗi vài giây
+    FE->>API: GET /orders/{code}/payment-status
+    API-->>FE: Trạng thái thanh toán
+  end
+end
+FE-->>KH: Thành công hoặc thất bại (thử lại / đổi sang COD)
+Note over API,DB: Quá 15 phút chưa thanh toán: Scheduler hủy đơn và trả tồn kho

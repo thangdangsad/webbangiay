@@ -1,0 +1,26 @@
+flowchart TD
+S(( )) --> A["Khách gửi yêu cầu đổi / trả"]
+A --> B{"Trong 7 ngày và đơn đã hoàn thành?"}
+B -- Không --> R["Từ chối tự động"]
+B -- Có --> C["CSKH xem xét yêu cầu và ảnh"]
+C --> D{"Duyệt?"}
+D -- Không --> R2["Từ chối, gửi email lý do"]
+D -- Có --> E["Gửi hướng dẫn trả hàng cho khách"]
+E --> F["Khách gửi hàng về"]
+F --> G["Kho kiểm tra hàng nhận về"]
+G --> H{"Hàng còn nguyên vẹn?"}
+H -- Có --> I["Nhập lại kho"]
+H -- Không --> J["Ghi nhận hàng lỗi, không nhập kho"]
+I --> K{"Hình thức xử lý"}
+J --> K
+K -- Đổi size/màu --> L["Tạo đơn đổi, giao hàng mới"]
+K -- Hoàn tiền --> M{"Đã thanh toán qua MoMo?"}
+M -- Có --> N["Hoàn tiền qua API MoMo"]
+M -- Không --> O["Hoàn tiền thủ công"]
+L --> T((( )))
+N --> T
+O --> T
+R --> T
+R2 --> T
+style S fill:#000,stroke:#000
+style T fill:#000,stroke:#000

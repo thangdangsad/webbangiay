@@ -1,0 +1,23 @@
+stateDiagram-v2
+direction LR
+state "Chưa thanh toán" as unpaid
+state "Chờ thanh toán" as pending
+state "Đã thanh toán" as paid
+state "Thất bại" as failed
+state "Hoàn một phần" as partial
+state "Đã hoàn tiền" as refunded
+state "Hết hạn / Hủy" as expired
+[*] --> unpaid: Tạo đơn
+unpaid --> pending: Tạo giao dịch MoMo
+unpaid --> paid: COD - thu tiền khi giao
+pending --> paid: IPN resultCode = 0
+pending --> failed: IPN thất bại
+failed --> pending: Khách thử lại
+pending --> expired: Quá 15 phút
+failed --> expired: Quá 15 phút
+paid --> partial: Hoàn một phần
+paid --> refunded: Hoàn toàn bộ
+partial --> refunded: Hoàn phần còn lại
+expired --> [*]
+refunded --> [*]
+paid --> [*]

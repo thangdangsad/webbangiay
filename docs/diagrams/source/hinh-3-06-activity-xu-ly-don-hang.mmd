@@ -1,0 +1,20 @@
+flowchart TD
+S(( )) --> A["Đơn mới - Chờ xác nhận"]
+A --> B["CSKH kiểm tra thông tin đơn"]
+B --> C{"Đơn hợp lệ?"}
+C -- Không --> D["Liên hệ khách hàng"]
+D --> E{"Khách xác nhận?"}
+E -- Không --> X["Hủy đơn, trả tồn kho, hoàn tiền nếu đã trả"]
+E -- Có --> F
+C -- Có --> F["Xác nhận đơn"]
+F --> G["Kho đóng gói"]
+G --> H["Tạo vận đơn, bàn giao vận chuyển, trừ tồn kho"]
+H --> I["Đang giao hàng"]
+I --> J{"Giao thành công?"}
+J -- Có --> K["Hoàn thành đơn, ghi nhận thu tiền COD"]
+J -- Không --> L["Hoàn hàng về kho, nhập lại tồn kho"]
+L --> X
+K --> T((( )))
+X --> T
+style S fill:#000,stroke:#000
+style T fill:#000,stroke:#000

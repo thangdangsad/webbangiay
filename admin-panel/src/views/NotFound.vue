@@ -1,0 +1,1 @@
+<template><div class="card" style="text-align:center;padding:60px"><h1>404</h1><p class="muted">Không tìm thấy trang.</p><router-link class="btn pri" to="/" style="margin-top:14px">Về trang chủ</router-link></div></template>

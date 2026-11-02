@@ -1,0 +1,24 @@
+sequenceDiagram
+autonumber
+participant FE as Nuxt / Vue
+participant API as Laravel API
+participant R as Redis auth
+FE->>API: Gọi API với access token đã hết hạn
+API-->>FE: 401 TOKEN_EXPIRED
+FE->>API: POST /auth/refresh (cookie refresh token)
+API->>R: Tra cứu hash refresh token (Lua script, atomic)
+alt Không tồn tại
+  API-->>FE: 401 REFRESH_INVALID
+  FE->>FE: Xóa trạng thái, chuyển trang đăng nhập
+else Refresh token hiện hành
+  API->>R: Xoay vòng: ghi token mới, chuyển token cũ sang used, cập nhật phiên
+  API-->>FE: 200 access token mới và cookie refresh token mới
+  FE->>API: Gửi lại request ban đầu
+  API-->>FE: 200 dữ liệu
+else Token cũ trong cửa sổ ân hạn 10 giây
+  API-->>FE: 200 access token mới (không xoay refresh token)
+else Token đã dùng, ngoài ân hạn (nghi bị đánh cắp)
+  API->>R: Xóa toàn bộ phiên của tài khoản
+  API-->>FE: 401 REFRESH_REUSED
+  FE->>FE: Yêu cầu đăng nhập lại
+end

@@ -1,0 +1,25 @@
+sequenceDiagram
+autonumber
+actor QL as Quản lý
+participant UI as Admin (Vue)
+participant API as Laravel API
+participant FS as Local storage
+participant DB as MySQL
+participant C as Redis cache
+QL->>UI: Nhập thông tin sản phẩm, chọn màu và size (sinh bảng SKU)
+QL->>UI: Chọn ảnh sản phẩm
+UI->>API: POST /admin/uploads (multipart)
+API->>API: Validate MIME, dung lượng, kích thước ảnh
+API->>FS: Lưu tạm vào storage/app/public/tmp
+API->>FS: Chuyển WebP, tạo bản _md và _sm
+API-->>UI: path và url ảnh
+UI-->>QL: Hiển thị ảnh xem trước
+QL->>UI: Bấm Lưu và hiển thị
+UI->>API: POST /admin/products (thông tin, biến thể, danh sách path ảnh)
+API->>DB: BEGIN TRANSACTION
+API->>DB: INSERT products, product_variants, inventory, product_images
+API->>FS: Di chuyển ảnh từ tmp sang products/{id}/
+API->>DB: COMMIT
+API->>C: Xóa cache catalog
+API-->>UI: 201 Sản phẩm
+UI-->>QL: Thông báo thành công

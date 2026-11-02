@@ -1,0 +1,4386 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "SoleHouse API",
+        "version": "1.0.0",
+        "description": "REST JSON. Auth: Bearer access token (JWT); refresh token ở cookie HttpOnly. Tiền: số nguyên VND."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "paths": {
+        "/admin/audit-logs": {
+            "get": {
+                "tags": [
+                    "admin/audit-logs"
+                ],
+                "summary": "Admin System Controller::auditLogs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: audit:read"
+            }
+        },
+        "/admin/auth/2fa/enable": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::enable2fa",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/auth/2fa/setup": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::setup2fa",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/auth/2fa/verify": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::verify2fa",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/admin/auth/login": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::login",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/admin/auth/logout": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::logout",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/admin/auth/logout-all": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::logoutAll",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/auth/refresh": {
+            "post": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::refresh",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/admin/auth/sessions": {
+            "get": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::sessions",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/auth/sessions/{sid}": {
+            "delete": {
+                "tags": [
+                    "admin/auth"
+                ],
+                "summary": "Staff Auth Controller::destroySession",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "sid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/banners": {
+            "get": {
+                "tags": [
+                    "admin/banners"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/banners"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/banners/{id}": {
+            "get": {
+                "tags": [
+                    "admin/banners"
+                ],
+                "summary": "Admin Resource Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/banners"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/banners"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/brands": {
+            "get": {
+                "tags": [
+                    "admin/brands"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/brands"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/brands/{id}": {
+            "put": {
+                "tags": [
+                    "admin/brands"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/brands"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/categories": {
+            "get": {
+                "tags": [
+                    "admin/categories"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/categories"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/categories/{id}": {
+            "put": {
+                "tags": [
+                    "admin/categories"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/categories"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/colors": {
+            "get": {
+                "tags": [
+                    "admin/colors"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/colors"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/colors/{id}": {
+            "put": {
+                "tags": [
+                    "admin/colors"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/colors"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/coupons": {
+            "get": {
+                "tags": [
+                    "admin/coupons"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/coupons"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/coupons/{id}": {
+            "get": {
+                "tags": [
+                    "admin/coupons"
+                ],
+                "summary": "Admin Resource Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/coupons"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/coupons"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/customers": {
+            "get": {
+                "tags": [
+                    "admin/customers"
+                ],
+                "summary": "Admin Customer Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: customer:read"
+            }
+        },
+        "/admin/customers/{id}": {
+            "get": {
+                "tags": [
+                    "admin/customers"
+                ],
+                "summary": "Admin Customer Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: customer:read"
+            }
+        },
+        "/admin/customers/{id}/status": {
+            "patch": {
+                "tags": [
+                    "admin/customers"
+                ],
+                "summary": "Admin Customer Controller::status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: customer:write"
+            }
+        },
+        "/admin/dashboard/summary": {
+            "get": {
+                "tags": [
+                    "admin/dashboard"
+                ],
+                "summary": "Report Controller::dashboard",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: dashboard:read"
+            }
+        },
+        "/admin/inventory": {
+            "get": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:read"
+            }
+        },
+        "/admin/inventory/adjust": {
+            "post": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::adjust",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:write"
+            }
+        },
+        "/admin/inventory/movements": {
+            "get": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::movements",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:read"
+            }
+        },
+        "/admin/inventory/receipts": {
+            "get": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::receipts",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::receipt",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:write"
+            }
+        },
+        "/admin/inventory/{variantId}/threshold": {
+            "patch": {
+                "tags": [
+                    "admin/inventory"
+                ],
+                "summary": "Admin Inventory Controller::threshold",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "variantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: inventory:write"
+            }
+        },
+        "/admin/me": {
+            "get": {
+                "tags": [
+                    "admin/me"
+                ],
+                "summary": "Staff Auth Controller::me",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/orders": {
+            "get": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: order:read"
+            }
+        },
+        "/admin/orders/{id}": {
+            "get": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: order:read"
+            }
+        },
+        "/admin/orders/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::cancel",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/orders/{id}/internal-note": {
+            "patch": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::internalNote",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: order:read"
+            }
+        },
+        "/admin/orders/{id}/payments": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::recordPayment",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: payment:manage"
+            }
+        },
+        "/admin/orders/{id}/payments/momo/query": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::momoQuery",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: payment:manage"
+            }
+        },
+        "/admin/orders/{id}/payments/momo/refund": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::momoRefund",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: payment:manage"
+            }
+        },
+        "/admin/orders/{id}/print": {
+            "get": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::print",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: order:read"
+            }
+        },
+        "/admin/orders/{id}/shipment": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::shipment",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: order:fulfil"
+            }
+        },
+        "/admin/orders/{id}/transition": {
+            "post": {
+                "tags": [
+                    "admin/orders"
+                ],
+                "summary": "Admin Order Controller::transition",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/pages": {
+            "get": {
+                "tags": [
+                    "admin/pages"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/pages"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            }
+        },
+        "/admin/pages/{id}": {
+            "get": {
+                "tags": [
+                    "admin/pages"
+                ],
+                "summary": "Admin Resource Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/pages"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/pages"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            }
+        },
+        "/admin/products": {
+            "get": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/products/bulk": {
+            "post": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::bulk",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/products/export": {
+            "get": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::export",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            }
+        },
+        "/admin/products/import": {
+            "post": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::import",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/products/{id}": {
+            "get": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "put": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/products/{id}/status": {
+            "patch": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::status",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/products/{id}/variants": {
+            "put": {
+                "tags": [
+                    "admin/products"
+                ],
+                "summary": "Admin Product Controller::syncVariants",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/promotions": {
+            "get": {
+                "tags": [
+                    "admin/promotions"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/promotions"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/promotions/{id}": {
+            "get": {
+                "tags": [
+                    "admin/promotions"
+                ],
+                "summary": "Admin Resource Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/promotions"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/promotions"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: marketing:manage"
+            }
+        },
+        "/admin/reports/inventory": {
+            "get": {
+                "tags": [
+                    "admin/reports"
+                ],
+                "summary": "Report Controller::inventory",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: report:read"
+            }
+        },
+        "/admin/reports/returns": {
+            "get": {
+                "tags": [
+                    "admin/reports"
+                ],
+                "summary": "Report Controller::returns",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: report:read"
+            }
+        },
+        "/admin/reports/revenue": {
+            "get": {
+                "tags": [
+                    "admin/reports"
+                ],
+                "summary": "Report Controller::revenue",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: report:read"
+            }
+        },
+        "/admin/reports/top-products": {
+            "get": {
+                "tags": [
+                    "admin/reports"
+                ],
+                "summary": "Report Controller::topProducts",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: report:read"
+            }
+        },
+        "/admin/returns": {
+            "get": {
+                "tags": [
+                    "admin/returns"
+                ],
+                "summary": "Admin Order Controller::returnsIndex",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: return:read"
+            }
+        },
+        "/admin/returns/{id}/{action}": {
+            "post": {
+                "tags": [
+                    "admin/returns"
+                ],
+                "summary": "Admin Order Controller::returnAction",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/reviews": {
+            "get": {
+                "tags": [
+                    "admin/reviews"
+                ],
+                "summary": "Admin Review Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            }
+        },
+        "/admin/reviews/{id}": {
+            "patch": {
+                "tags": [
+                    "admin/reviews"
+                ],
+                "summary": "Admin Review Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/reviews"
+                ],
+                "summary": "Admin Review Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: content:manage"
+            }
+        },
+        "/admin/roles": {
+            "get": {
+                "tags": [
+                    "admin/roles"
+                ],
+                "summary": "Admin System Controller::roles",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: staff:manage"
+            }
+        },
+        "/admin/roles/{id}": {
+            "put": {
+                "tags": [
+                    "admin/roles"
+                ],
+                "summary": "Admin System Controller::roleUpdate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: staff:manage"
+            }
+        },
+        "/admin/settings": {
+            "get": {
+                "tags": [
+                    "admin/settings"
+                ],
+                "summary": "Admin System Controller::settings",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/settings"
+                ],
+                "summary": "Admin System Controller::updateSettings",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            }
+        },
+        "/admin/shipping-rates": {
+            "get": {
+                "tags": [
+                    "admin/shipping-rates"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/shipping-rates"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            }
+        },
+        "/admin/shipping-rates/{id}": {
+            "get": {
+                "tags": [
+                    "admin/shipping-rates"
+                ],
+                "summary": "Admin Resource Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            },
+            "put": {
+                "tags": [
+                    "admin/shipping-rates"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            },
+            "delete": {
+                "tags": [
+                    "admin/shipping-rates"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: settings:manage"
+            }
+        },
+        "/admin/sizes": {
+            "get": {
+                "tags": [
+                    "admin/sizes"
+                ],
+                "summary": "Admin Resource Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:read"
+            },
+            "post": {
+                "tags": [
+                    "admin/sizes"
+                ],
+                "summary": "Admin Resource Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/sizes/{id}": {
+            "put": {
+                "tags": [
+                    "admin/sizes"
+                ],
+                "summary": "Admin Resource Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/sizes"
+                ],
+                "summary": "Admin Resource Controller::destroy",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/admin/staff": {
+            "get": {
+                "tags": [
+                    "admin/staff"
+                ],
+                "summary": "Admin System Controller::staffIndex",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: staff:manage"
+            },
+            "post": {
+                "tags": [
+                    "admin/staff"
+                ],
+                "summary": "Admin System Controller::staffStore",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: staff:manage"
+            }
+        },
+        "/admin/staff/{id}": {
+            "put": {
+                "tags": [
+                    "admin/staff"
+                ],
+                "summary": "Admin System Controller::staffUpdate",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: staff:manage"
+            }
+        },
+        "/admin/uploads": {
+            "post": {
+                "tags": [
+                    "admin/uploads"
+                ],
+                "summary": "Admin Product Controller::upload",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            },
+            "delete": {
+                "tags": [
+                    "admin/uploads"
+                ],
+                "summary": "Admin Product Controller::deleteUpload",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    },
+                    "403": {
+                        "description": "FORBIDDEN"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "description": "Quyền cần có: product:write"
+            }
+        },
+        "/attributes": {
+            "get": {
+                "tags": [
+                    "attributes"
+                ],
+                "summary": "Store Catalog Controller::attributes",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::forgotPassword",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/google": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::google",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::login",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::logout",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/logout-all": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::logoutAll",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::refresh",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::register",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::resetPassword",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/auth/verify-email": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Customer Auth Controller::verifyEmail",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/brands": {
+            "get": {
+                "tags": [
+                    "brands"
+                ],
+                "summary": "Store Catalog Controller::brands",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/cart": {
+            "get": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/cart/coupon": {
+            "post": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::applyCoupon",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::removeCoupon",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/cart/items": {
+            "post": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::add",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/cart/items/{variantId}": {
+            "patch": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::update",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "variantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Cart Controller::remove",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "variantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/categories": {
+            "get": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Store Catalog Controller::categories",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/contact": {
+            "post": {
+                "tags": [
+                    "contact"
+                ],
+                "summary": "Public Controller::contact",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/home": {
+            "get": {
+                "tags": [
+                    "home"
+                ],
+                "summary": "Store Catalog Controller::home",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/locations/provinces/{province}/{district}": {
+            "get": {
+                "tags": [
+                    "locations"
+                ],
+                "summary": "Public Controller::locations",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "province",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "district",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Customer Auth Controller::me",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Customer Auth Controller::updateMe",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/addresses": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::addresses",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::storeAddress",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/addresses/{id}": {
+            "put": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::updateAddress",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::deleteAddress",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/orders": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Store Order Controller::myOrders",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/orders/{code}": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Store Order Controller::myOrder",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/orders/{code}/cancel": {
+            "post": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Store Order Controller::cancel",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/orders/{code}/returns": {
+            "post": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Store Order Controller::requestReturn",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/password": {
+            "put": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Customer Auth Controller::changePassword",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/sessions": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Customer Auth Controller::sessions",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/sessions/{sid}": {
+            "delete": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Customer Auth Controller::destroySession",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "sid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/uploads": {
+            "post": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Store Order Controller::uploadReturnImage",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/wishlist": {
+            "get": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::wishlist",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me/wishlist/{productId}": {
+            "put": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::addWishlist",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "me"
+                ],
+                "summary": "Me Controller::removeWishlist",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    },
+                    "401": {
+                        "description": "TOKEN_EXPIRED | TOKEN_INVALID | SESSION_REVOKED"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/newsletter": {
+            "post": {
+                "tags": [
+                    "newsletter"
+                ],
+                "summary": "Public Controller::newsletter",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "post": {
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Store Order Controller::store",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/orders/track": {
+            "get": {
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Store Order Controller::track",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/orders/{code}": {
+            "get": {
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Store Order Controller::publicOrder",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/orders/{code}/payment-status": {
+            "get": {
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Store Order Controller::paymentStatus",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/orders/{code}/switch-cod": {
+            "post": {
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Store Order Controller::switchCod",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/pages": {
+            "get": {
+                "tags": [
+                    "pages"
+                ],
+                "summary": "Public Controller::pages",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/pages/{slug}": {
+            "get": {
+                "tags": [
+                    "pages"
+                ],
+                "summary": "Public Controller::page",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/payment-methods": {
+            "get": {
+                "tags": [
+                    "payment-methods"
+                ],
+                "summary": "Store Order Controller::paymentMethods",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/payments/momo/create": {
+            "post": {
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Momo Controller::create",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/payments/momo/fake/{momoOrderId}": {
+            "get": {
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Momo Controller::fakePage",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "momoOrderId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/payments/momo/ipn": {
+            "post": {
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Momo Controller::ipn",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/payments/momo/return": {
+            "get": {
+                "tags": [
+                    "payments"
+                ],
+                "summary": "Momo Controller::back",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Store Catalog Controller::index",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/products/{slug}": {
+            "get": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Store Catalog Controller::show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/products/{slug}/reviews": {
+            "get": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Store Catalog Controller::reviews",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Store Catalog Controller::storeReview",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/shipping/quote": {
+            "post": {
+                "tags": [
+                    "shipping"
+                ],
+                "summary": "Store Order Controller::quote",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        },
+        "/store-info": {
+            "get": {
+                "tags": [
+                    "store-info"
+                ],
+                "summary": "Public Controller::storeInfo",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Lỗi validate { error: { code, message, details } }"
+                    }
+                }
+            }
+        }
+    }
+}

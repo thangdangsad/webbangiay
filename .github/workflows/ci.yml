@@ -1,0 +1,49 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: api } }
+    services:
+      mysql:
+        image: mysql:8.4
+        env: { MYSQL_ROOT_PASSWORD: password, MYSQL_DATABASE: shoe_test, MYSQL_USER: shoe, MYSQL_PASSWORD: password }
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -ppassword" --health-interval=5s --health-retries=20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+    env: { DB_HOST: 127.0.0.1, DB_USERNAME: root, DB_PASSWORD: password }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: '8.3', extensions: gd, pdo_mysql, bcmath }
+      - run: cp .env.example .env && composer install --no-interaction --prefer-dist
+      - run: php artisan key:generate
+      - run: vendor/bin/pint --test
+      - run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+      - run: php artisan test
+
+  admin:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: admin-panel } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  storefront:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: storefront } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm test
+      - run: npm run build

@@ -1,0 +1,126 @@
+classDiagram
+direction LR
+class User {
+  +bigint id
+  +string email
+  +string phone
+  +string fullName
+  +string passwordHash
+  +enum status
+  +register()
+  +login()
+  +updateProfile()
+}
+class Address {
+  +string receiverName
+  +string phone
+  +string street
+  +bool isDefault
+}
+class Staff {
+  +string email
+  +string fullName
+  +enum status
+  +verifyTotp()
+  +can(permission)
+}
+class Role {
+  +string name
+}
+class Permission {
+  +string resource
+  +string action
+}
+class Category {
+  +string name
+  +string slug
+}
+class Brand {
+  +string name
+  +string logoPath
+}
+class Product {
+  +string name
+  +string slug
+  +enum gender
+  +bigint basePrice
+  +enum status
+  +publish()
+  +hide()
+}
+class ProductVariant {
+  +string sku
+  +bigint price
+  +int weightG
+}
+class ProductImage {
+  +string path
+  +bool isPrimary
+}
+class Inventory {
+  +int onHand
+  +int reserved
+  +available()
+  +reserve(qty)
+  +release(qty)
+}
+class Cart {
+  +addItem()
+  +updateQty()
+  +applyCoupon()
+  +total()
+}
+class Order {
+  +string code
+  +enum status
+  +enum paymentStatus
+  +bigint grandTotal
+  +transitionTo(status)
+  +cancel()
+}
+class OrderItem {
+  +string productName
+  +bigint unitPrice
+  +int qty
+}
+class Payment {
+  +enum method
+  +enum status
+  +string providerTxnId
+  +markPaid()
+  +refund()
+}
+class Shipment {
+  +string carrier
+  +string trackingCode
+}
+class ReturnRequest {
+  +string reason
+  +enum status
+  +approve()
+  +receive()
+  +refund()
+}
+class Coupon {
+  +string code
+  +enum type
+  +isValid()
+  +discountFor(order)
+}
+User "1" --> "*" Address
+User "1" --> "0..1" Cart
+User "1" --> "*" Order
+Staff "*" --> "1" Role
+Role "*" --> "*" Permission
+Brand "1" --> "*" Product
+Category "1" --> "*" Product
+Product "1" *-- "1..*" ProductVariant
+Product "1" *-- "*" ProductImage
+ProductVariant "1" -- "1" Inventory
+Cart "1" *-- "*" ProductVariant : chứa
+Order "1" *-- "1..*" OrderItem
+Order "1" --> "*" Payment
+Order "1" --> "0..1" Shipment
+Order "1" --> "*" ReturnRequest
+OrderItem "*" --> "1" ProductVariant
+Coupon "0..1" --> "*" Order : áp dụng

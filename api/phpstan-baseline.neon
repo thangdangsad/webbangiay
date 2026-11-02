@@ -1,0 +1,835 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireUnpaidOrders.php
+
+		-
+			message: '#^Argument of an invalid type Illuminate\\Routing\\RouteCollectionInterface supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Console/Commands/GenerateOpenApi.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ReconcileMomo.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Auth/Http/Controllers/AdminSystemController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Auth/Http/Controllers/AdminSystemController.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Auth/Http/Controllers/CustomerAuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Auth/Http/Controllers/StaffAuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Auth/Http/Controllers/StaffAuthController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Modules/Auth/Http/Middleware/CheckOrigin.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$hex\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$images\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$label\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$on_hand\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reserved\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Cart/Services/CartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$alt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$barcode\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$compare_at_price\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$inventory\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_primary\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$on_hand\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$price\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$sku\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$weight_g\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: mixed$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>on_hand" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 4
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>reserved" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminProductController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminResourceController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminReviewController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/AdminReviewController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/StoreCatalogController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/StoreCatalogController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/StoreCatalogController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/StoreCatalogController.php
+
+		-
+			message: '#^Offset ''ends_at'' does not exist on array\{type\: string, value\: int, name\: string, products\: array, categories\: array, brands\: array\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Modules/Catalog/Http/Controllers/StoreCatalogController.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Catalog/Services/PricingService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$alt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$inventory\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_primary\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$sku\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Services/ProductPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Modules/Catalog/Services/ProductService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Catalog/Services/ProductService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Catalog/Services/SearchIndexer.php
+
+		-
+			message: '#^Access to an undefined property App\\Modules\\Inventory\\Models\\StockReceipt\:\:\$items_sum_qty\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$label\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$low_stock_threshold\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$on_hand\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reserved\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$sku\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>low_stock_threshold" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>on_hand" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 3
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>reserved" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 3
+			path: app/Modules/Inventory/Http/Controllers/AdminInventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$color\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$line_total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$orderItem\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$payment_method\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$payment_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$qty\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$restock\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$sku\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unit_price\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/AdminOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/StoreOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Http/Controllers/StoreOrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$carrier\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$delivered_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$method\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$momo_order_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$note\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$paid_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$provider_txn_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$refund_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$result_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$shipped_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$to_status\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$tracking_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Cannot call method gt\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Order/Services/OrderPresenter.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$note\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$to_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Modules/Order/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderStateMachine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$method\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderStateMachine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/OrderStateMachine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$method\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$orderItem\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$qty\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$restock\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Cannot call method lt\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Order/Services/ReturnService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$phone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Payment/Http/Controllers/MomoController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$expires_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$momo_order_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$momo_request_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$provider_txn_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Property App\\Modules\\Payment\\Models\\Payment\:\:\$raw_payload \(string\|null\) does not accept array\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Modules/Payment/Services/MomoService.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Promotion/Services/CouponService.php
+
+		-
+			message: '#^Cannot call method isPast\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/Promotion/Services/CouponService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>free_threshold" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Modules/Shipping/Services/ShippingService.php
+
+		-
+			message: '#^Access to an undefined property App\\Modules\\User\\Models\\User\:\:\$total_spent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Modules/User/Http/Controllers/AdminCustomerController.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Modules/User/Http/Controllers/AdminCustomerController.php
+
+		-
+			message: '#^Method App\\Modules\\User\\Http\\Controllers\\MeController\:\:own\(\) should return App\\Modules\\User\\Models\\Address but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Modules/User/Http/Controllers/MeController.php

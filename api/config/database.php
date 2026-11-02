@@ -166,17 +166,26 @@ return [
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
 
+        // 0 = default/cache, 1 = auth (phiên + refresh token, noeviction ở production), 2 = queue
         'cache' => [
-            'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
-            'username' => env('REDIS_USERNAME'),
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_CACHE_DB', '1'),
-            'max_retries' => env('REDIS_MAX_RETRIES', 3),
-            'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
-            'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
-            'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+            'database' => env('REDIS_CACHE_DB', '0'),
+        ],
+
+        'auth' => [
+            'host' => env('REDIS_AUTH_HOST', env('REDIS_HOST', '127.0.0.1')),
+            'password' => env('REDIS_AUTH_PASSWORD', env('REDIS_PASSWORD')),
+            'port' => env('REDIS_AUTH_PORT', env('REDIS_PORT', '6379')),
+            'database' => env('REDIS_AUTH_DB', '1'),
+        ],
+
+        'queue' => [
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_QUEUE_DB', '2'),
         ],
 
     ],

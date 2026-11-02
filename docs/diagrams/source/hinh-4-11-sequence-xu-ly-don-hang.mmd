@@ -1,0 +1,33 @@
+sequenceDiagram
+autonumber
+actor CS as CSKH
+actor KHO as Nhân viên kho
+participant UI as Admin (Vue)
+participant API as Laravel API
+participant SM as OrderStateMachine
+participant DB as MySQL
+participant Q as Queue
+CS->>UI: Mở đơn Chờ xác nhận
+UI->>API: GET /admin/orders/{id}
+API-->>UI: Chi tiết đơn hàng
+CS->>UI: Bấm Xác nhận đơn
+UI->>API: POST /admin/orders/{id}/transition (to = confirmed)
+API->>SM: Kiểm tra quyền và chuyển trạng thái hợp lệ
+alt Không hợp lệ
+  SM-->>API: Từ chối
+  API-->>UI: 409 Chuyển trạng thái không hợp lệ
+else Hợp lệ
+  SM-->>API: Cho phép
+  API->>DB: Cập nhật status, ghi order_status_history và audit_logs
+  API->>Q: Gửi thông báo cho khách hàng
+  API-->>UI: 200 OK
+end
+KHO->>UI: Bấm Đóng gói
+UI->>API: POST transition (to = packing)
+API->>DB: Cập nhật trạng thái và lịch sử
+KHO->>UI: Nhập mã vận đơn, bấm Giao hàng
+UI->>API: POST transition (to = shipping) và thông tin vận đơn
+API->>DB: Tạo shipment, trừ on_hand và reserved, ghi movement (sale)
+API->>Q: Gửi email Đang giao
+API-->>UI: 200 OK
+Note over API,DB: Giao thành công: chuyển completed (COD ghi nhận đã thu tiền)

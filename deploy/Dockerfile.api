@@ -1,0 +1,13 @@
+# API Laravel: PHP-FPM (dùng chung image cho php-fpm, horizon, scheduler)
+FROM php:8.3-fpm-alpine
+RUN apk add --no-cache libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev libzip-dev icu-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
+    && docker-php-ext-install -j"$(nproc)" gd pdo_mysql bcmath pcntl opcache zip intl
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /var/www/html
+COPY api/composer.json api/composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
+COPY api/ ./
+RUN composer dump-autoload --optimize --no-dev && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+COPY deploy/php.ini /usr/local/etc/php/conf.d/zz-app.ini

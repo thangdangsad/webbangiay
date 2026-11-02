@@ -1,0 +1,26 @@
+sequenceDiagram
+autonumber
+actor KH as Khách hàng
+participant FE as Nuxt (Pinia)
+participant API as Laravel API
+participant R as Redis auth
+participant DB as MySQL
+KH->>FE: Nhập email và mật khẩu
+FE->>API: POST /auth/login
+API->>R: Kiểm tra giới hạn đăng nhập sai
+R-->>API: Cho phép
+API->>DB: Tìm người dùng theo email
+DB-->>API: Bản ghi người dùng
+API->>API: Xác minh mật khẩu (Argon2id)
+alt Sai thông tin đăng nhập
+  API->>R: Tăng bộ đếm đăng nhập sai
+  API-->>FE: 422 Thông tin không chính xác
+  FE-->>KH: Hiển thị thông báo lỗi
+else Đúng thông tin
+  API->>API: Tạo sid, sinh refresh token ngẫu nhiên
+  API->>R: Lưu phiên, hash refresh token, danh sách sid
+  API->>API: Ký access token JWT (15 phút)
+  API-->>FE: 200 access_token và Set-Cookie rt_customer (HttpOnly)
+  FE->>FE: Lưu access token trong bộ nhớ (Pinia)
+  FE-->>KH: Chuyển đến trang tài khoản
+end

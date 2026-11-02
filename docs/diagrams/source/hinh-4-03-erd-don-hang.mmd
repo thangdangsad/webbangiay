@@ -1,0 +1,136 @@
+erDiagram
+  users ||--o{ addresses : "có"
+  users ||--o| carts : "có giỏ"
+  carts ||--o{ cart_items : "gồm"
+  users ||--o{ orders : "đặt"
+  orders ||--|{ order_items : "gồm"
+  orders ||--o{ order_status_history : "lịch sử"
+  orders ||--o{ payments : "thanh toán"
+  orders ||--o| shipments : "vận chuyển"
+  orders ||--o{ returns : "đổi trả"
+  returns ||--|{ return_items : "gồm"
+  coupons ||--o{ coupon_redemptions : "được dùng"
+  orders ||--o{ coupon_redemptions : "áp dụng"
+  users ||--o{ product_reviews : "viết"
+  users ||--o{ wishlists : "yêu thích"
+  users {
+    bigint id PK
+    varchar email UK
+    varchar phone UK
+    varchar password_hash
+    varchar full_name
+    enum status
+    timestamp email_verified_at
+  }
+  addresses {
+    bigint id PK
+    bigint user_id FK
+    varchar receiver_name
+    varchar phone
+    varchar province_code
+    varchar street
+    bool is_default
+  }
+  carts {
+    bigint id PK
+    bigint user_id FK
+    varchar coupon_code
+  }
+  cart_items {
+    bigint id PK
+    bigint cart_id FK
+    bigint variant_id FK
+    int qty
+  }
+  orders {
+    bigint id PK
+    varchar code UK
+    bigint user_id FK
+    json ship_address
+    enum status
+    enum payment_status
+    enum payment_method
+    bigint subtotal
+    bigint discount_total
+    bigint shipping_fee
+    bigint grand_total
+    varchar idempotency_key UK
+  }
+  order_items {
+    bigint id PK
+    bigint order_id FK
+    bigint variant_id FK
+    varchar product_name
+    varchar sku
+    bigint unit_price
+    int qty
+    bigint line_total
+  }
+  order_status_history {
+    bigint id PK
+    bigint order_id FK
+    varchar from_status
+    varchar to_status
+    varchar actor_type
+    bigint actor_id
+  }
+  payments {
+    bigint id PK
+    bigint order_id FK
+    enum method
+    bigint amount
+    enum status
+    varchar momo_order_id
+    varchar provider_txn_id UK
+    timestamp expires_at
+    timestamp paid_at
+  }
+  shipments {
+    bigint id PK
+    bigint order_id FK
+    varchar carrier
+    varchar tracking_code
+    bigint fee
+    enum status
+  }
+  returns {
+    bigint id PK
+    bigint order_id FK
+    varchar reason
+    enum status
+    bigint refund_amount
+  }
+  return_items {
+    bigint id PK
+    bigint return_id FK
+    bigint order_item_id FK
+    int qty
+    bool restock
+  }
+  coupons {
+    bigint id PK
+    varchar code UK
+    enum type
+    bigint value
+    bigint min_order
+    int usage_limit
+    timestamp ends_at
+  }
+  coupon_redemptions {
+    bigint id PK
+    bigint coupon_id FK
+    bigint order_id FK
+    bigint amount
+  }
+  product_reviews {
+    bigint id PK
+    bigint product_id FK
+    bigint user_id FK
+    tinyint rating
+    text content
+    enum status
+  }
+  wishlists {
+    bigint user_id PK
+    bigint product_id PK
+  }

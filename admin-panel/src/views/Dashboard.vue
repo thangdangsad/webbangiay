@@ -1,128 +1,39 @@
-<script setup>
-import { onMounted, ref } from 'vue'
-
-import Card from 'primevue/card'
-
-import { http } from '@/api/client'
-
-const pendingOrders = ref(null)
-const totalProducts = ref(null)
-const totalCustomers = ref(null)
-const loading = ref(true)
-
-onMounted(async () => {
-  try {
-    const [pendingRes, productsRes, customersRes] = await Promise.all([
-      http.get('/api/admin/orders', { params: { status: 0, per_page: 1 } }),
-      http.get('/api/products', { params: { per_page: 1 } }),
-      http.get('/api/admin/customers', { params: { per_page: 1 } }),
-    ])
-    pendingOrders.value = pendingRes.data.meta.total
-    totalProducts.value = productsRes.data.meta.total
-    totalCustomers.value = customersRes.data.meta.total
-  } catch {
-    // Leave counts as null; the cards below just show "—".
-  } finally {
-    loading.value = false
-  }
-})
-</script>
-
 <template>
-  <div>
-    <div class="page-header">
-      <h1 class="page-title">Tổng quan</h1>
+  <div v-if="d">
+    <div class="ph"><div><h1>Dashboard</h1><p>Tổng quan hoạt động cửa hàng</p></div>
+      <div class="acts"><select v-model="range" class="f" style="width:auto" @change="load"><option value="today">Hôm nay</option><option value="7d">7 ngày</option><option value="30d">30 ngày</option><option value="90d">90 ngày</option></select></div></div>
+    <div class="kpis">
+      <div class="kpi"><small>Doanh thu</small><b>{{ money(d.kpi.revenue) }}</b></div>
+      <div class="kpi"><small>Số đơn</small><b>{{ d.kpi.orders }}</b></div>
+      <div class="kpi" :class="{ warn: d.kpi.pending_orders > 0 }"><small>Đơn chờ xử lý</small><b>{{ d.kpi.pending_orders }}</b></div>
+      <div class="kpi"><small>Khách mới</small><b>{{ d.kpi.new_customers }}</b></div>
     </div>
-
-    <div class="stat-grid">
-      <RouterLink :to="{ name: 'orders' }" class="stat-link">
-        <Card class="stat-card">
-          <template #content>
-            <div class="stat-icon stat-icon-warning"><i class="pi pi-clock"></i></div>
-            <div class="stat-label">Đơn chờ xác nhận</div>
-            <div class="stat-value">{{ loading ? '…' : pendingOrders ?? '—' }}</div>
-          </template>
-        </Card>
-      </RouterLink>
-      <RouterLink :to="{ name: 'products' }" class="stat-link">
-        <Card class="stat-card">
-          <template #content>
-            <div class="stat-icon stat-icon-primary"><i class="pi pi-shopping-bag"></i></div>
-            <div class="stat-label">Tổng sản phẩm</div>
-            <div class="stat-value">{{ loading ? '…' : totalProducts ?? '—' }}</div>
-          </template>
-        </Card>
-      </RouterLink>
-      <RouterLink :to="{ name: 'customers' }" class="stat-link">
-        <Card class="stat-card">
-          <template #content>
-            <div class="stat-icon stat-icon-success"><i class="pi pi-users"></i></div>
-            <div class="stat-label">Tổng khách hàng</div>
-            <div class="stat-value">{{ loading ? '…' : totalCustomers ?? '—' }}</div>
-          </template>
-        </Card>
-      </RouterLink>
+    <div class="cols">
+      <div class="card"><h3>Doanh thu theo ngày</h3>
+        <div class="chart-wrap"><div class="chart"><div v-for="s in d.series" :key="s.date" :style="{ height: h(s.revenue) + '%' }" :title="`${s.date}: ${money(s.revenue)} (${s.orders} đơn)`"><span v-if="d.series.length <= 14">{{ s.date.slice(8) }}/{{ s.date.slice(5, 7) }}</span></div></div></div></div>
+      <div class="card"><h3>Bán chạy <router-link to="/reports">Xem báo cáo</router-link></h3>
+        <div v-if="!d.top_products.length" class="muted">Chưa có dữ liệu.</div>
+        <div v-for="(p, i) in d.top_products" :key="i" style="display:flex;justify-content:space-between;margin:10px 0"><span>{{ i + 1 }}. {{ p.product_name }}</span><b>{{ p.qty }}</b></div></div>
+    </div>
+    <div class="cols eq">
+      <div class="card"><h3>Cảnh báo tồn kho thấp <router-link v-if="auth.can('inventory:read')" to="/inventory">Xem kho</router-link></h3>
+        <div v-if="!d.low_stock.length" class="muted">Không có cảnh báo.</div>
+        <div v-for="l in d.low_stock" :key="l.sku" style="display:flex;justify-content:space-between;margin:8px 0"><span>{{ l.name }} <small class="muted">(size {{ l.size }})</small></span><span class="pill" :class="l.available <= 0 ? 'p-red' : 'p-yellow'">Còn {{ l.available }}</span></div></div>
+      <div class="card"><h3>Đơn mới nhất <router-link to="/orders">Tất cả</router-link></h3>
+        <div v-for="o in d.latest_orders" :key="o.id" style="display:flex;justify-content:space-between;align-items:center;margin:10px 0"><router-link class="lnk" :to="`/orders/${o.id}`"><b>{{ o.code }}</b></router-link><span>{{ money(o.grand_total) }}</span><Pill :map="ORDER_STATUS" :value="o.status" /></div></div>
     </div>
   </div>
+  <div v-else class="loading">Đang tải...</div>
 </template>
 
-<style scoped>
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.stat-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-
-.stat-card {
-  transition: box-shadow 0.15s;
-}
-
-.stat-link:hover .stat-card {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-bottom: 14px;
-}
-
-.stat-icon-primary {
-  background: color-mix(in srgb, var(--p-primary-color) 15%, transparent);
-  color: var(--p-primary-color);
-}
-
-.stat-icon-warning {
-  background: #fff4de;
-  color: #9a6700;
-}
-
-.stat-icon-success {
-  background: #e7f6ec;
-  color: #1e6b36;
-}
-
-.stat-label {
-  color: var(--p-text-muted-color);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  margin-top: 6px;
-}
-</style>
+<script setup>
+import { computed, onMounted, ref } from 'vue'
+import api, { money, ORDER_STATUS } from '../api'
+import { useAuthStore } from '../stores/auth'
+import Pill from '../components/Pill.vue'
+const auth = useAuthStore(); const d = ref(null); const range = ref('7d')
+const max = computed(() => Math.max(1, ...(d.value?.series || []).map((s) => s.revenue)))
+const h = (v) => Math.max(1, Math.round((v / max.value) * 100))
+async function load() { d.value = (await api.get('/admin/dashboard/summary', { params: { range: range.value } })).data.data }
+onMounted(load)
+</script>

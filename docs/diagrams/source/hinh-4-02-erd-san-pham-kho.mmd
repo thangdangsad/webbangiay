@@ -1,0 +1,96 @@
+erDiagram
+  brands ||--o{ products : "có"
+  categories ||--o{ products : "chứa"
+  categories ||--o{ categories : "cha - con"
+  products ||--|{ product_variants : "có biến thể"
+  products ||--o{ product_images : "có ảnh"
+  colors ||--o{ product_variants : ""
+  sizes ||--o{ product_variants : ""
+  colors ||--o{ product_images : "ảnh theo màu"
+  product_variants ||--|| inventory : "tồn kho"
+  product_variants ||--o{ inventory_movements : "biến động"
+  product_variants ||--o{ stock_receipt_items : ""
+  stock_receipts ||--|{ stock_receipt_items : "gồm"
+  brands {
+    bigint id PK
+    varchar name
+    varchar slug UK
+    varchar logo_path
+    bool is_active
+  }
+  categories {
+    bigint id PK
+    bigint parent_id FK
+    varchar name
+    varchar slug UK
+    int sort_order
+  }
+  products {
+    bigint id PK
+    bigint brand_id FK
+    bigint category_id FK
+    varchar name
+    varchar slug UK
+    enum gender
+    text description
+    bigint base_price
+    enum status
+  }
+  colors {
+    bigint id PK
+    varchar name
+    varchar hex
+  }
+  sizes {
+    bigint id PK
+    varchar system
+    varchar label
+    int sort_order
+  }
+  product_variants {
+    bigint id PK
+    bigint product_id FK
+    bigint color_id FK
+    bigint size_id FK
+    varchar sku UK
+    bigint price
+    bigint compare_at_price
+    int weight_g
+  }
+  product_images {
+    bigint id PK
+    bigint product_id FK
+    bigint color_id FK
+    varchar path
+    int sort_order
+    bool is_primary
+  }
+  inventory {
+    bigint variant_id PK
+    int on_hand
+    int reserved
+    int low_stock_threshold
+    int version
+  }
+  inventory_movements {
+    bigint id PK
+    bigint variant_id FK
+    enum type
+    int qty_delta
+    varchar ref_type
+    bigint ref_id
+    bigint staff_id FK
+  }
+  stock_receipts {
+    bigint id PK
+    varchar supplier
+    bigint staff_id FK
+    timestamp created_at
+  }
+  stock_receipt_items {
+    bigint id PK
+    bigint receipt_id FK
+    bigint variant_id FK
+    int qty
+    bigint unit_cost
+  }

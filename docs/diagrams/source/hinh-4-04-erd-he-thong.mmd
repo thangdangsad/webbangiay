@@ -1,0 +1,80 @@
+erDiagram
+  roles ||--o{ staff_users : "gán"
+  roles ||--o{ role_permissions : "có"
+  permissions ||--o{ role_permissions : "thuộc"
+  staff_users ||--o{ audit_logs : "thực hiện"
+  promotions ||--o{ promotion_targets : "áp dụng cho"
+  staff_users {
+    bigint id PK
+    varchar email UK
+    varchar password_hash
+    varchar full_name
+    bigint role_id FK
+    enum status
+    varchar two_factor_secret
+    timestamp last_login_at
+  }
+  roles {
+    bigint id PK
+    varchar name UK
+    varchar description
+  }
+  permissions {
+    bigint id PK
+    varchar name UK
+    varchar resource
+    varchar action
+  }
+  role_permissions {
+    bigint role_id PK
+    bigint permission_id PK
+  }
+  audit_logs {
+    bigint id PK
+    bigint staff_id FK
+    varchar action
+    varchar entity
+    bigint entity_id
+    json before
+    json after
+    varchar ip
+  }
+  promotions {
+    bigint id PK
+    varchar name
+    enum discount_type
+    bigint value
+    timestamp starts_at
+    timestamp ends_at
+  }
+  promotion_targets {
+    bigint id PK
+    bigint promotion_id FK
+    bigint product_id FK
+    bigint category_id FK
+    bigint brand_id FK
+  }
+  banners {
+    bigint id PK
+    varchar title
+    varchar image_path
+    varchar mobile_image_path
+    varchar link
+    varchar position
+    bool is_active
+  }
+  cms_pages {
+    bigint id PK
+    varchar slug UK
+    varchar title
+    text content
+    bool is_published
+  }
+  shipping_rates {
+    bigint id PK
+    varchar zone
+    int min_weight
+    int max_weight
+    bigint fee
+    bigint free_threshold
+  }

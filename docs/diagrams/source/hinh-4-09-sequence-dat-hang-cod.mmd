@@ -1,0 +1,32 @@
+sequenceDiagram
+autonumber
+actor KH as Khách hàng
+participant FE as Nuxt
+participant API as OrderController
+participant OS as OrderService
+participant IS as InventoryService
+participant DB as MySQL
+participant Q as Queue
+KH->>FE: Bấm Đặt hàng (COD)
+FE->>API: POST /orders (Idempotency-Key)
+API->>API: Validate dữ liệu (Form Request)
+API->>OS: createOrder(giỏ hàng, địa chỉ, coupon)
+OS->>OS: Khóa chống đặt trùng (Redis lock)
+OS->>DB: BEGIN TRANSACTION
+loop Mỗi biến thể trong giỏ (theo id tăng dần)
+  OS->>IS: reserve(variant, qty)
+  IS->>DB: UPDATE inventory SET reserved += qty WHERE on_hand - reserved >= qty
+  break Số dòng ảnh hưởng = 0 (hết hàng)
+    IS-->>OS: OUT_OF_STOCK
+    OS->>DB: ROLLBACK
+    OS-->>API: Lỗi hết hàng
+    API-->>FE: 409 Sản phẩm đã hết hàng
+    FE-->>KH: Thông báo và cập nhật giỏ hàng
+  end
+end
+OS->>DB: INSERT orders, order_items (snapshot giá), payments, movements
+OS->>DB: COMMIT
+OS->>Q: Đẩy job gửi email xác nhận
+OS-->>API: Đơn hàng (mã SH-...)
+API-->>FE: 201 Created
+FE-->>KH: Trang đặt hàng thành công

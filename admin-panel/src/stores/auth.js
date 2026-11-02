@@ -1,48 +1,36 @@
 import { defineStore } from 'pinia'
+import api, { refreshToken } from '../api'
 
-import { http } from '@/api/client'
-
-export const ROLE_ADMIN = 1
-export const ROLE_STAFF = 2
+let initPromise = null
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    staff: null,
-    // true until the initial GET /api/admin/me check (on app load) resolves,
-    // so the UI doesn't flash "logged out" before we know for sure.
-    ready: false,
-  }),
-
-  getters: {
-    isLoggedIn: (state) => state.staff !== null,
-    isAdmin: (state) => Number(state.staff?.role) === ROLE_ADMIN,
-  },
-
+  state: () => ({ token: null, user: null, ready: false }),
+  getters: { loggedIn: (s) => !!s.user },
   actions: {
-    /**
-     * Restore session on app load by asking the API who we are. A 401 just
-     * means "not logged in" — not an error worth surfacing.
-     */
-    async fetchMe() {
-      try {
-        const { data } = await http.get('/api/admin/me')
-        this.staff = data.data
-      } catch {
-        this.staff = null
-      } finally {
-        this.ready = true
-      }
+    setSession(res) {
+      this.token = res.access_token
+      if (res.user) this.user = res.user
     },
-
-    async login(payload) {
-      const { data } = await http.post('/api/admin/login', payload)
-      this.staff = data.data
-      return this.staff
+    clear() { this.token = null; this.user = null },
+    can(perm) { return !!this.user?.permissions?.includes(perm) },
+    canAny(perms) { return !perms || perms.some((p) => this.can(p)) },
+    init() {
+      initPromise ??= refreshToken().catch(() => this.clear()).finally(() => (this.ready = true))
+      return initPromise
     },
-
+    async login(email, password) {
+      const { data } = await api.post('/admin/auth/login', { email, password })
+      if (data.data?.requires_2fa) return data.data
+      this.setSession(data)
+      return null
+    },
+    async verify2fa(challenge_token, code) {
+      const { data } = await api.post('/admin/auth/2fa/verify', { challenge_token, code })
+      this.setSession(data)
+    },
     async logout() {
-      await http.post('/api/admin/logout')
-      this.staff = null
+      try { await api.post('/admin/auth/logout') } catch {}
+      this.clear()
     },
   },
 })

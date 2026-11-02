@@ -1,0 +1,21 @@
+sequenceDiagram
+autonumber
+actor KHO as Nhân viên kho
+participant UI as Admin (Vue)
+participant API as Laravel API
+participant DB as MySQL
+participant C as Redis cache
+KHO->>UI: Tạo phiếu nhập: nhà cung cấp, SKU, số lượng, giá nhập
+UI->>API: POST /admin/inventory/receipts
+API->>API: Validate dữ liệu và kiểm tra quyền inventory:adjust
+API->>DB: BEGIN TRANSACTION
+loop Mỗi dòng sản phẩm
+  API->>DB: INSERT stock_receipt_items
+  API->>DB: UPDATE inventory SET on_hand += qty
+  API->>DB: INSERT inventory_movements (receipt)
+end
+API->>DB: COMMIT
+API->>DB: Ghi audit_logs
+API->>C: Xóa cache sản phẩm liên quan (tag catalog)
+API-->>UI: 201 Phiếu nhập
+UI-->>KHO: Hiển thị tồn kho mới

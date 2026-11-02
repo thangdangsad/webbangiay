@@ -1,0 +1,14 @@
+stateDiagram-v2
+direction LR
+state "Đang hoạt động" as active
+state "Đã xoay vòng token" as rotated
+state "Đã thu hồi" as revoked
+state "Hết hạn" as expired
+[*] --> active: Đăng nhập thành công
+active --> rotated: Refresh token hợp lệ
+rotated --> active: Cấp token mới
+active --> revoked: Đăng xuất / Đổi mật khẩu / Khóa tài khoản
+active --> revoked: Phát hiện tái sử dụng refresh token
+active --> expired: Quá hạn tuyệt đối hoặc idle timeout
+revoked --> [*]
+expired --> [*]

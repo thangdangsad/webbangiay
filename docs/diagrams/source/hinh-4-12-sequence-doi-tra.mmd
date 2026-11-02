@@ -1,0 +1,31 @@
+sequenceDiagram
+autonumber
+actor KH as Khách hàng
+actor CS as CSKH
+actor KHO as Nhân viên kho
+participant API as Laravel API
+participant DB as MySQL
+participant MM as MoMo
+KH->>API: POST /me/orders/{code}/returns (lý do, ảnh)
+API->>API: Kiểm tra đơn đã hoàn thành và còn trong 7 ngày
+alt Không hợp lệ
+  API-->>KH: 422 Không đủ điều kiện đổi trả
+else Hợp lệ
+  API->>DB: Lưu yêu cầu (requested) và ảnh vào storage
+  API-->>KH: 201 Đã gửi yêu cầu
+end
+CS->>API: POST /admin/returns/{id}/approve
+API->>DB: status = approved
+API-->>KH: Email hướng dẫn gửi hàng
+KH->>KHO: Gửi hàng trả về cửa hàng
+KHO->>API: POST /admin/returns/{id}/receive (restock = true/false)
+API->>DB: status = received, nếu restock thì cộng on_hand và ghi movement (return)
+CS->>API: POST /admin/returns/{id}/refund
+alt Đơn đã thanh toán qua MoMo
+  API->>MM: Refund theo transId
+  MM-->>API: Kết quả hoàn tiền
+else Đơn COD
+  API->>API: Ghi nhận hoàn tiền thủ công (chuyển khoản)
+end
+API->>DB: status = refunded, payment_status = refunded hoặc partial_refund
+API-->>KH: Email xác nhận đã hoàn tiền

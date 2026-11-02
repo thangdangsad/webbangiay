@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Danh mục & thuộc tính · SoleHouse Admin</title><link rel="stylesheet" href="../assets/admin.css"></head><body>
+<div class="app"><aside><div class="logo">Sole<b>House</b> <span style="font-size:11px;color:#64748b">Admin</span></div><h6>Tổng quan</h6><a class="" href="dashboard.html">📊 Dashboard</a><h6>Bán hàng</h6><a class="" href="orders.html">🧾 Đơn hàng<em>12</em></a><a class="" href="returns.html">↩️ Đổi trả / hoàn tiền<em>2</em></a><a class="" href="customers.html">👥 Khách hàng</a><h6>Sản phẩm</h6><a class="" href="products.html">👟 Sản phẩm</a><a class="on" href="catalog.html">🗂️ Danh mục · Thương hiệu · Thuộc tính</a><h6>Kho hàng</h6><a class="" href="inventory.html">📦 Tồn kho<em>5</em></a><a class="" href="stock-receipt.html">📥 Phiếu nhập hàng</a><a class="" href="movements.html">🔁 Lịch sử biến động</a><h6>Marketing</h6><a class="" href="coupons.html">🎟️ Mã giảm giá</a><a class="" href="promotions.html">⚡ Khuyến mãi / Flash sale</a><a class="" href="banners.html">🖼️ Banner</a><h6>Báo cáo</h6><a class="" href="reports.html">📈 Báo cáo</a><h6>Nội dung</h6><a class="" href="cms.html">📝 Trang nội dung</a><h6>Cài đặt</h6><a class="" href="settings.html">⚙️ Cửa hàng & thanh toán</a><a class="" href="settings-shipping.html">🚚 Vận chuyển</a><a class="" href="staff.html">🔐 Nhân viên & phân quyền</a><a class="" href="audit-log.html">🕘 Nhật ký hoạt động</a></aside>
+<div><div class="top"><div class="q"><input placeholder="Tìm đơn hàng, sản phẩm, khách hàng..."></div>
+<div class="me"><span>🔔</span><span class="av">T</span><span>Thắng · Admin</span><a href="login.html" style="color:#6b7280;font-weight:400">Đăng xuất</a></div></div>
+<main><div class="ph"><div><h1>Danh mục · Thương hiệu · Thuộc tính</h1><p>Dữ liệu dùng chung cho bộ lọc ngoài web bán hàng</p></div></div>
+<div class="cols eq"><div class="card"><h3>Danh mục (cây 2 cấp) <button class="btn sm pri">+ Thêm</button></h3><ul class="tree">
+<li>☰ <b>Giày nam</b><span class="n">86 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li class="sub">↳ Sneaker<span class="n">52 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li class="sub">↳ Giày da<span class="n">18 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li class="sub">↳ Chạy bộ<span class="n">16 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li>☰ <b>Giày nữ</b><span class="n">64 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li class="sub">↳ Sneaker<span class="n">40 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li class="sub">↳ Sandal<span class="n">24 SP</span><span class="sw on"></span><button class="btn sm">Sửa</button></li>
+<li>☰ <b>Trẻ em</b><span class="n">36 SP</span><span class="sw"></span><button class="btn sm">Sửa</button></li></ul>
+<small style="color:#6b7280">Kéo thả để sắp xếp thứ tự hiển thị. Danh mục có sản phẩm không thể xóa, chỉ ẩn.</small></div>
+<div class="card"><h3>Thêm / sửa danh mục</h3><div class="fld"><label>Tên danh mục *</label><input class="f" value="Sneaker"></div><div class="fld"><label>Slug</label><input class="f" value="sneaker-nam"></div>
+<div class="fld"><label>Danh mục cha</label><select class="f"><option>Giày nam</option><option>— Không có —</option></select></div><div class="fld"><label>Mô tả SEO</label><textarea class="f" style="height:70px"></textarea></div>
+<div class="acts"><button class="btn pri">Lưu</button><button class="btn">Hủy</button></div></div></div>
+<div class="cols eq"><div class="card tcard"><h3 style="padding:16px 16px 0">Thương hiệu <button class="btn sm pri">+ Thêm</button></h3><table class="tb"><thead><tr><th>Thương hiệu</th><th class="r">Sản phẩm</th><th>Hiển thị</th><th></th></tr></thead><tbody>
+<tr><td><b>Nike</b><small>nike</small></td><td class="r">48</td><td><span class="sw on"></span></td><td><button class="btn sm">Sửa</button></td></tr>
+<tr><td><b>Adidas</b><small>adidas</small></td><td class="r">41</td><td><span class="sw on"></span></td><td><button class="btn sm">Sửa</button></td></tr>
+<tr><td><b>Asics</b><small>asics</small></td><td class="r">22</td><td><span class="sw on"></span></td><td><button class="btn sm">Sửa</button></td></tr>
+<tr><td><b>Vans</b><small>vans</small></td><td class="r">19</td><td><span class="sw on"></span></td><td><button class="btn sm">Sửa</button></td></tr></tbody></table></div>
+<div class="card"><h3>Thuộc tính biến thể</h3><div class="sec-t">Màu sắc</div><div style="margin-bottom:14px"><span class="tagi"><span class="swatch" style="background:#111"></span>Đen #111111</span><span class="tagi"><span class="swatch" style="background:#fff"></span>Trắng #FFFFFF</span><span class="tagi"><span class="swatch" style="background:#e8472b"></span>Đỏ cam #E8472B</span><span class="tagi"><span class="swatch" style="background:#2563eb"></span>Xanh #2563EB</span><span class="tagi">+ Thêm màu</span></div>
+<div class="sec-t">Size (hệ EU)</div><div><span class="tagi">36</span><span class="tagi">37</span><span class="tagi">38</span><span class="tagi">39</span><span class="tagi">40</span><span class="tagi">41</span><span class="tagi">42</span><span class="tagi">43</span><span class="tagi">44</span><span class="tagi">45</span><span class="tagi">+ Thêm size</span></div>
+<small style="color:#6b7280;display:block;margin-top:12px">Bảng quy đổi US/UK/cm được dùng cho trang “Hướng dẫn chọn size”.</small></div></div></main></div></div></body></html>

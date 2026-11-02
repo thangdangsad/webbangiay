@@ -1,25 +1,23 @@
 {
-  "name": "storefront",
+  "name": "shoe-storefront",
   "private": true,
-  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "nuxt dev --port 3000",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare",
+    "test": "vitest run"
   },
   "dependencies": {
-    "axios": "^1.20.0",
-    "flowbite": "^4.0.2",
-    "flowbite-vue": "^0.4.0",
-    "pinia": "^3.0.4",
-    "vue": "^3.5.44",
-    "vue-router": "^4.6.4"
+    "@pinia/nuxt": "^0.11.0",
+    "nuxt": "^3.17.0",
+    "pinia": "^3.0.0",
+    "vue": "latest",
+    "vue-router": "latest"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "@vitejs/plugin-vue": "^6.0.10",
-    "tailwindcss": "^4.3.3",
-    "vite": "^7.3.7"
+    "vitest": "^5.0.5"
   }
 }

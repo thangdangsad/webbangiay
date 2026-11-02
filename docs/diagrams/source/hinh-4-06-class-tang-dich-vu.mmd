@@ -1,0 +1,93 @@
+classDiagram
+direction TB
+class AuthController {
+  +register()
+  +login()
+  +refresh()
+  +logout()
+}
+class ProductController {
+  +index()
+  +show()
+  +store()
+  +update()
+}
+class OrderController {
+  +store()
+  +cancel()
+  +transition()
+}
+class PaymentController {
+  +createMomo()
+  +momoIpn()
+  +paymentStatus()
+}
+class UploadController {
+  +store()
+  +destroy()
+}
+class TokenService {
+  +issueTokens()
+  +verifyAccess()
+  +rotateRefresh()
+  +revokeSession()
+}
+class RedisSessionStore {
+  +saveSession()
+  +findByRefreshHash()
+  +denyJti()
+  +revokeAll()
+}
+class ProductService {
+  +create()
+  +syncVariants()
+  +syncImages()
+}
+class OrderService {
+  +createOrder()
+  +cancelOrder()
+}
+class OrderStateMachine {
+  +canTransition()
+  +apply()
+}
+class InventoryService {
+  +reserve()
+  +release()
+  +receive()
+  +adjust()
+}
+class PaymentService {
+  +createMomoPayment()
+  +handleIpn()
+  +refund()
+}
+class MomoClient {
+  +create()
+  +query()
+  +refund()
+  +verifySignature()
+}
+class FileStorageService {
+  +storeImage()
+  +makeThumbnails()
+  +moveFromTmp()
+  +delete()
+}
+class Model {
+  Eloquent Models
+}
+AuthController ..> TokenService
+TokenService ..> RedisSessionStore
+ProductController ..> ProductService
+UploadController ..> FileStorageService
+ProductService ..> FileStorageService
+ProductService ..> Model
+OrderController ..> OrderService
+OrderService ..> OrderStateMachine
+OrderService ..> InventoryService
+OrderService ..> PaymentService
+PaymentController ..> PaymentService
+PaymentService ..> MomoClient
+InventoryService ..> Model
+OrderService ..> Model

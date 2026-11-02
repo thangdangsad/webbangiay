@@ -1,25 +1,13 @@
-<script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
-import ConfirmDialog from 'primevue/confirmdialog'
-import Toast from 'primevue/toast'
-
-import AppLayout from '@/layout/AppLayout.vue'
-
-const route = useRoute()
-
-// Login page renders full-screen, without the sidebar/topbar shell. The
-// router's navigation guard (see router/index.js) already awaits
-// auth.fetchMe() before the first route resolves, so by the time any view
-// here mounts the auth store is known-good — no separate loading gate needed.
-const showShell = computed(() => route.name !== 'login')
-</script>
-
 <template>
-  <Toast />
-  <ConfirmDialog />
-
-  <AppLayout v-if="showShell" />
-  <RouterView v-else />
+  <router-view v-if="$route.meta.public || !auth.loggedIn" />
+  <AdminLayout v-else><router-view :key="$route.fullPath" /></AdminLayout>
+  <div v-if="ui.toast" class="toast">{{ ui.toast }}</div>
 </template>
+
+<script setup>
+import { useAuthStore } from './stores/auth'
+import { useUi } from './stores/ui'
+import AdminLayout from './layouts/AdminLayout.vue'
+const auth = useAuthStore()
+const ui = useUi()
+</script>

@@ -1,0 +1,21 @@
+stateDiagram-v2
+direction LR
+state "Chờ xác nhận" as pending
+state "Đã xác nhận" as confirmed
+state "Đang đóng gói" as packing
+state "Đang giao" as shipping
+state "Hoàn thành" as completed
+state "Đã hủy" as cancelled
+state "Đổi trả" as returned
+[*] --> pending: Khách đặt hàng
+pending --> confirmed: Xác nhận
+pending --> cancelled: Hủy đơn
+confirmed --> packing: Kho đóng gói
+confirmed --> cancelled: Hủy đơn
+packing --> shipping: Bàn giao vận chuyển
+shipping --> completed: Giao thành công
+shipping --> cancelled: Giao thất bại
+completed --> returned: Duyệt đổi trả
+cancelled --> [*]
+returned --> [*]
+completed --> [*]

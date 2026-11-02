@@ -1,0 +1,27 @@
+flowchart TD
+S(( )) --> A["Truy cập website"]
+A --> B["Tìm kiếm / lọc / duyệt sản phẩm"]
+B --> C["Xem chi tiết sản phẩm"]
+C --> D{"Đã chọn màu và size?"}
+D -- Chưa --> C
+D -- Rồi --> E{"Còn hàng?"}
+E -- Hết --> C
+E -- Còn --> F["Thêm vào giỏ hàng"]
+F --> G{"Mua thêm?"}
+G -- Có --> B
+G -- Không --> H["Xem giỏ hàng, áp mã giảm giá"]
+H --> I["Nhập thông tin nhận hàng"]
+I --> J["Chọn vận chuyển và thanh toán"]
+J --> K{"Phương thức thanh toán"}
+K -- COD --> L["Xác nhận đặt hàng"]
+K -- MoMo --> M["Chuyển sang MoMo thanh toán"]
+M --> N{"Thành công?"}
+N -- Có --> L
+N -- Không --> O{"Thử lại?"}
+O -- Có --> M
+O -- Không --> J
+L --> P["Hệ thống tạo đơn, giữ tồn kho, gửi email"]
+P --> Q["Theo dõi đơn hàng"]
+Q --> T((( )))
+style S fill:#000,stroke:#000
+style T fill:#000,stroke:#000
