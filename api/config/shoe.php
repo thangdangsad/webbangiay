@@ -44,6 +44,9 @@ return [
         'return_days' => 7,
     ],
 
+    // Seeder: tạo 16 sản phẩm DEMO (ảnh vẽ). Mặc định tắt — dùng dữ liệu thật qua data-migration/.
+    'seed_demo_products' => (bool) env('SEED_DEMO_PRODUCTS', false),
+
     'google' => ['client_id' => env('GOOGLE_CLIENT_ID')],
 
     'search' => [

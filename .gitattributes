@@ -1,0 +1,5 @@
+# Script shell và file cấu hình luôn dùng LF (tránh lỗi "bad interpreter: ^M" khi clone trên Windows)
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Dockerfile* text eol=lf

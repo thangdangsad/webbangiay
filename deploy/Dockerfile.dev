@@ -1,0 +1,7 @@
+# Image PHP dùng cho ./dev.sh khi máy không cài PHP (đặc biệt Windows/WSL).
+# dev.sh tự build image này lần đầu:  docker build -t shoe-php-dev -f deploy/Dockerfile.dev deploy
+FROM php:8.3-cli
+COPY --from=ghcr.io/mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+RUN apt-get update && apt-get install -y --no-install-recommends git unzip curl && rm -rf /var/lib/apt/lists/* \
+    && install-php-extensions gd pdo_mysql bcmath pcntl zip intl exif opcache @composer
+ENV COMPOSER_ALLOW_SUPERUSER=1 HOME=/tmp

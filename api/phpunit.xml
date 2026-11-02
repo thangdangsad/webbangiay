@@ -27,6 +27,7 @@
         <env name="REDIS_PREFIX" value="shoe_test:"/>
         <env name="MOMO_FAKE" value="true"/>
         <env name="SEARCH_DRIVER" value="mysql"/>
+        <env name="SEED_DEMO_PRODUCTS" value="true"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

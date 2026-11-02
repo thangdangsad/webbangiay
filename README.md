@@ -9,7 +9,33 @@ Thiết kế: `docs/docs/01-BA-pages.md` (BA) · `docs/docs/02-BE-design.md` (Ba
 | `admin-panel/` | Vue 3 + Vite + Pinia + Axios (SPA) | 5173 |
 | `legacy/` | Code PHP cũ (chỉ tham khảo) | – |
 
-## Chạy local
+## Chạy nhanh bằng `dev.sh` (khuyên dùng)
+
+Một lệnh ở thư mục gốc để chạy cả backend và 2 frontend:
+
+```bash
+./dev.sh            # chạy tất cả; Ctrl+C để dừng API + 2 frontend
+./dev.sh --fresh    # xóa sạch DB rồi migrate + seed lại
+./dev.sh --stop     # dừng cả MySQL và Redis (Docker)
+```
+
+**Yêu cầu:** Docker, Node.js + npm. PHP không bắt buộc: nếu máy không có PHP 8.3+ và Composer thì script tự build rồi dùng image Docker `shoe-php-dev` (từ `deploy/Dockerfile.dev`; đổi bằng biến môi trường `DOCKER_PHP_IMAGE`). Chạy trên Linux/macOS (bash) và Windows qua **WSL2** — hướng dẫn cài đặt từng bước: [`setup-window.md`](setup-window.md).
+
+**Script làm gì, theo thứ tự**
+1. Kiểm tra cổng 8000, 3000, 5173 còn trống; nếu bị chiếm thì báo lỗi và dừng (không chạy chồng).
+2. Tạo `api/.env` từ `.env.example` nếu chưa có.
+3. Khởi động MySQL + Redis bằng Docker (dữ liệu MySQL ở `api/data_mysql`) và chờ sẵn sàng.
+4. `composer install` nếu chưa có `vendor`, sinh `APP_KEY`, `storage:link`, `migrate`. Chỉ seed dữ liệu mẫu khi DB còn trống (hoặc khi dùng `--fresh`).
+5. Chạy API `:8000` kèm `queue:work` (gửi email) và `schedule:work` (hủy đơn MoMo quá hạn, đối soát, tổng hợp doanh thu…).
+6. Nếu đã build dữ liệu crawl (`data-migration/build.py`) và DB chưa có sản phẩm thật thì tự nhập `import_products.sql` (xem `data-migration/README.md`). Sản phẩm demo ảnh vẽ chỉ tạo khi `SEED_DEMO_PRODUCTS=true`.
+7. `npm install` nếu cần, rồi chạy Storefront `:3000` và Admin `:5173`.
+8. Chờ cả ba phản hồi, in địa chỉ và tài khoản mẫu.
+
+**Khi dừng:** Ctrl+C tắt API, queue, scheduler và 2 frontend (kể cả container PHP). MySQL/Redis vẫn chạy nền để lần sau lên nhanh; tắt bằng `./dev.sh --stop`.
+
+**Log** từng phần nằm trong `.logs/` (`api.log`, `queue.log`, `schedule.log`, `storefront.log`, `admin.log`, `migrate.log`, `docker.log`, `composer.log`, `npm-*.log`) — đã gitignore. Khi một bước lỗi, script báo tên file log cần xem.
+
+## Chạy từng phần thủ công
 
 ```bash
 # 1. Hạ tầng (MySQL lưu ở api/data_mysql, Redis 3 DB: 0 cache · 1 auth · 2 queue)

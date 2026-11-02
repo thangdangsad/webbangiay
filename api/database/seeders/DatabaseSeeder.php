@@ -65,10 +65,6 @@ class DatabaseSeeder extends Seeder
 
     private function catalog(): void
     {
-        $brands = ['Nike', 'Adidas', 'Asics', 'Vans', 'Converse', 'Reebok', 'On', 'New Balance'];
-        foreach ($brands as $b) {
-            Brand::firstOrCreate(['slug' => Str::slug($b)], ['name' => $b]);
-        }
         $cats = ['Sneaker' => ['Sneaker cổ thấp', 'Sneaker cổ cao'], 'Chạy bộ' => [], 'Giày da' => [], 'Sandal' => []];
         $i = 0;
         foreach ($cats as $name => $children) {
@@ -85,8 +81,12 @@ class DatabaseSeeder extends Seeder
             Size::firstOrCreate(['system' => 'EU', 'label' => (string) $eu], ['sort_order' => $k]);
         }
 
-        if (Product::exists()) {
+        if (! config('shoe.seed_demo_products') || Product::exists()) {
             return;
+        }
+        $brands = ['Nike', 'Adidas', 'Asics', 'Vans', 'Converse', 'Reebok', 'On', 'New Balance'];
+        foreach ($brands as $b) {
+            Brand::firstOrCreate(['slug' => Str::slug($b)], ['name' => $b]);
         }
         $svc = app(ProductService::class);
         $catalog = [
