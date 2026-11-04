@@ -3,11 +3,12 @@
 #   Hạ tầng (Docker): MySQL + Redis → API Laravel :8000 (+ queue + scheduler) → Storefront :3000 → Admin :5173
 # Tùy chọn:  ./dev.sh --fresh   xóa sạch DB rồi migrate + seed lại
 #            ./dev.sh --stop    dừng cả hạ tầng Docker (MySQL, Redis)
+#            ./dev.sh --reset-db  XÓA dữ liệu MySQL (api/data_mysql) để khởi tạo lại user/mật khẩu theo api/.env (sửa lỗi 'Access denied for user')
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 API="$ROOT/api"; LOGS="$ROOT/.logs"; mkdir -p "$LOGS"
-FRESH=0
-for a in "$@"; do case "$a" in --fresh) FRESH=1 ;; --stop) (cd "$API" && docker compose down); exit 0 ;; esac; done
+FRESH=0; RESET_DB=0
+for a in "$@"; do case "$a" in --fresh) FRESH=1 ;; --reset-db) RESET_DB=1; FRESH=1 ;; --stop) (cd "$API" && docker compose down); exit 0 ;; esac; done
 
 c_ok()  { printf '\033[32m✔ %s\033[0m\n' "$*"; }
 c_inf() { printf '\033[36m➜ %s\033[0m\n' "$*"; }
@@ -54,10 +55,18 @@ for p in 8000 3000 5173; do port_busy $p && { c_err "Cổng $p đang bị chiế
 
 # 1. Hạ tầng
 [ -f "$API/.env" ] || { cp "$API/.env.example" "$API/.env"; c_inf "Đã tạo api/.env từ .env.example"; NEW_ENV=1; }
+# đọc thông tin DB từ api/.env (mặc định khớp compose.yaml)
+env_get() { grep -E "^$1=" "$API/.env" | head -1 | cut -d= -f2- | tr -d '"\r'; }
+DB_ROOT_PASS="$(env_get DB_PASSWORD)"; DB_ROOT_PASS="${DB_ROOT_PASS:-password}"; DB_NAME="$(env_get DB_DATABASE)"; DB_NAME="${DB_NAME:-shoe}"
+if [ "$RESET_DB" = 1 ]; then
+  c_inf "Reset MySQL: xóa api/data_mysql..."
+  (cd "$API" && docker compose down) >"$LOGS/docker.log" 2>&1
+  docker run --rm -v "$API:/work" alpine sh -c 'rm -rf /work/data_mysql' >>"$LOGS/docker.log" 2>&1
+fi
 c_inf "Khởi động MySQL + Redis (Docker)..."
 (cd "$API" && docker compose up -d mysql redis) >"$LOGS/docker.log" 2>&1 || { c_err "docker compose lỗi, xem .logs/docker.log"; trap - EXIT; exit 1; }
 for i in $(seq 1 60); do
-  (cd "$API" && docker compose exec -T mysql mysqladmin ping -h127.0.0.1 -uroot -ppassword --silent >/dev/null 2>&1) && break
+  (cd "$API" && docker compose exec -T mysql mysqladmin ping -h127.0.0.1 -uroot -p"$DB_ROOT_PASS" --silent >/dev/null 2>&1) && break
   [ "$i" = 60 ] && { c_err "MySQL không sẵn sàng"; trap - EXIT; exit 1; }; sleep 2
 done
 c_ok "MySQL + Redis sẵn sàng"
@@ -68,18 +77,21 @@ grep -q '^APP_KEY=.\+' "$API/.env" || php_run php artisan key:generate --force >
 [ -e "$API/public/storage" ] || php_run php artisan storage:link >/dev/null 2>&1
 if [ "$FRESH" = 1 ]; then c_inf "migrate:fresh --seed..."; php_run php artisan migrate:fresh --seed --force >"$LOGS/migrate.log" 2>&1 || { c_err "migrate lỗi, xem .logs/migrate.log"; trap - EXIT; exit 1; }
 else
-  php_run php artisan migrate --force >"$LOGS/migrate.log" 2>&1 || { c_err "migrate lỗi, xem .logs/migrate.log"; trap - EXIT; exit 1; }
+  php_run php artisan migrate --force >"$LOGS/migrate.log" 2>&1 || {
+    if grep -q "Access denied" "$LOGS/migrate.log"; then c_err "MySQL từ chối user/mật khẩu trong api/.env (dữ liệu MySQL cũ được tạo với thông tin khác). Chạy:  ./dev.sh --reset-db   (xóa dữ liệu MySQL rồi tạo lại)"
+    else c_err "migrate lỗi, xem .logs/migrate.log"; fi
+    trap - EXIT; exit 1; }
   ROLES=$(php_run php artisan tinker --execute='echo \App\Modules\User\Models\Role::count();' 2>/dev/null | tr -dc '0-9')
   if [ "${ROLES:-0}" = 0 ]; then c_inf "DB trống → seed dữ liệu mẫu..."; php_run php artisan db:seed --force >>"$LOGS/migrate.log" 2>&1 || { c_err "seed lỗi"; trap - EXIT; exit 1; }; fi
 fi
 # Nhập dữ liệu sản phẩm thật (crawl) nếu đã build (data-migration/build.py) và DB chưa có
 SQL_IMPORT="$ROOT/data-migration/import_products.sql"
 if [ -f "$SQL_IMPORT" ]; then
-  REAL=$(cd "$API" && docker compose exec -T mysql mysql -uroot -ppassword -N shoe -e "SELECT COUNT(*) FROM products WHERE id >= 1000" 2>/dev/null | tr -dc '0-9')
+  REAL=$(cd "$API" && docker compose exec -T mysql mysql -uroot -p"$DB_ROOT_PASS" -N "$DB_NAME" -e "SELECT COUNT(*) FROM products WHERE id >= 1000" 2>/dev/null | tr -dc '0-9')
   if [ "${REAL:-0}" = 0 ]; then
     if [ -d "$API/storage/app/public/products/1000" ]; then
       c_inf "Nhập dữ liệu sản phẩm thật (data-migration/import_products.sql)..."
-      (cd "$API" && docker compose exec -T mysql mysql -uroot -ppassword --default-character-set=utf8mb4 shoe < "$SQL_IMPORT") >"$LOGS/import-products.log" 2>&1 \
+      (cd "$API" && docker compose exec -T mysql mysql -uroot -p"$DB_ROOT_PASS" --default-character-set=utf8mb4 "$DB_NAME" < "$SQL_IMPORT") >"$LOGS/import-products.log" 2>&1 \
         && c_ok "Đã nhập sản phẩm" || c_err "Nhập sản phẩm lỗi, xem .logs/import-products.log"
     else
       c_inf "Có import_products.sql nhưng chưa có ảnh → chạy: python3 data-migration/build.py --src <thư mục Scraping/data>"

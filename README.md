@@ -16,6 +16,7 @@ Một lệnh ở thư mục gốc để chạy cả backend và 2 frontend:
 ```bash
 ./dev.sh            # chạy tất cả; Ctrl+C để dừng API + 2 frontend
 ./dev.sh --fresh    # xóa sạch DB rồi migrate + seed lại
+./dev.sh --reset-db # XÓA dữ liệu MySQL (api/data_mysql) rồi tạo lại — dùng khi lỗi 'Access denied for user'
 ./dev.sh --stop     # dừng cả MySQL và Redis (Docker)
 ```
 

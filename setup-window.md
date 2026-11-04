@@ -151,7 +151,7 @@ Lần đầu mất vài phút (build image PHP, `composer install`, `npm install
 
 Mở trực tiếp các địa chỉ này bằng trình duyệt **trên Windows** (WSL2 tự chuyển tiếp `localhost`). Luôn dùng `localhost`, đừng dùng `127.0.0.1` (cookie đăng nhập sẽ không gửi được).
 
-Dừng: **Ctrl+C**. Tắt luôn MySQL/Redis: `./dev.sh --stop`. Reset sạch dữ liệu: `./dev.sh --fresh`.
+Dừng: **Ctrl+C**. Tắt luôn MySQL/Redis: `./dev.sh --stop`. Reset dữ liệu: `./dev.sh --fresh` (migrate + seed lại); `./dev.sh --reset-db` (xóa cả dữ liệu MySQL, dùng khi lỗi *Access denied*).
 
 Soạn code bằng VS Code: cài extension **WSL**, rồi trong Ubuntu gõ `code .` tại thư mục dự án.
 
@@ -202,6 +202,7 @@ curl -s localhost:8000/up          # sau khi ./dev.sh: API trả 200
 | `bash: ./dev.sh: /bin/bash^M: bad interpreter` | File bị CRLF. Chạy `sed -i 's/\r$//' dev.sh` (hoặc `dos2unix dev.sh`), và đặt `git config --global core.autocrlf input`. |
 | `Cannot connect to the Docker daemon` / `docker: command not found` trong WSL | Mở Docker Desktop và đợi nó chạy xong; kiểm tra bước bật *WSL Integration* cho Ubuntu (Phần 2). |
 | `Cổng 8000/3000/5173 đang bị chiếm` | Tìm tiến trình: PowerShell `netstat -ano \| findstr :8000` rồi `taskkill /PID <pid> /F`; hoặc trong WSL `ss -ltnp \| grep 8000`. Tắt dev server cũ. |
+| `SQLSTATE[HY000] [1045] Access denied for user 'shoe'@'172.20.0.1'` | MySQL chỉ đọc user/mật khẩu ở **lần khởi tạo đầu tiên**. Thư mục `api/data_mysql` cũ (tạo với thông tin khác, hoặc khởi tạo dở do lỗi quyền) khiến `api/.env` không còn khớp. Chạy `./dev.sh --reset-db` (xóa dữ liệu MySQL rồi tạo lại theo `.env`). Chạy thủ công: `cd api`, `docker compose down`, xóa thư mục `data_mysql`, `docker compose up -d mysql redis`. Kiểm tra: `docker compose exec mysql mysql -uroot -ppassword -e "SELECT user,host FROM mysql.user"`. |
 | MySQL không lên, báo cổng 3306 bận | Máy đang chạy MySQL/XAMPP/Laragon MySQL. Tắt nó, hoặc đặt `FORWARD_DB_PORT=3307` trong `api/.env` **và** `DB_PORT=3307`. Tương tự Redis: `FORWARD_REDIS_PORT` + `REDIS_PORT`. |
 | `npm install` rất chậm hoặc lỗi quyền | Dự án đang nằm trong `/mnt/c/...`. Chuyển vào `~/` của WSL. |
 | `EACCES` khi `npm install -g` | Dùng nvm (Phần 4) thay vì cài Node bằng `apt`. |
