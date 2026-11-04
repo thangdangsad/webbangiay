@@ -3,7 +3,7 @@
 #   Hạ tầng (Docker): MySQL + Redis → API Laravel :8000 (+ queue + scheduler) → Storefront :3000 → Admin :5173
 # Tùy chọn:  ./dev.sh --fresh   xóa sạch DB rồi migrate + seed lại
 #            ./dev.sh --stop    dừng cả hạ tầng Docker (MySQL, Redis)
-#            ./dev.sh --reset-db  XÓA dữ liệu MySQL (api/data_mysql) để khởi tạo lại user/mật khẩu theo api/.env (sửa lỗi 'Access denied for user')
+#            ./dev.sh --reset-db  XÓA dữ liệu MySQL (volume shoe-mysql) để khởi tạo lại user/mật khẩu theo api/.env (sửa lỗi 'Access denied for user')
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 API="$ROOT/api"; LOGS="$ROOT/.logs"; mkdir -p "$LOGS"
@@ -59,8 +59,8 @@ for p in 8000 3000 5173; do port_busy $p && { c_err "Cổng $p đang bị chiế
 env_get() { grep -E "^$1=" "$API/.env" | head -1 | cut -d= -f2- | tr -d '"\r'; }
 DB_ROOT_PASS="$(env_get DB_PASSWORD)"; DB_ROOT_PASS="${DB_ROOT_PASS:-password}"; DB_NAME="$(env_get DB_DATABASE)"; DB_NAME="${DB_NAME:-shoe}"
 if [ "$RESET_DB" = 1 ]; then
-  c_inf "Reset MySQL: xóa api/data_mysql..."
-  (cd "$API" && docker compose down) >"$LOGS/docker.log" 2>&1
+  c_inf "Reset MySQL: xóa volume dữ liệu (shoe-mysql)..."
+  (cd "$API" && docker compose down -v) >"$LOGS/docker.log" 2>&1
   docker run --rm -v "$API:/work" alpine sh -c 'rm -rf /work/data_mysql' >>"$LOGS/docker.log" 2>&1
 fi
 c_inf "Khởi động MySQL + Redis (Docker)..."
@@ -69,6 +69,12 @@ for i in $(seq 1 60); do
   (cd "$API" && docker compose exec -T mysql mysqladmin ping -h127.0.0.1 -uroot -p"$DB_ROOT_PASS" --silent >/dev/null 2>&1) && break
   [ "$i" = 60 ] && { c_err "MySQL không sẵn sàng"; trap - EXIT; exit 1; }; sleep 2
 done
+# root ping OK chưa chắc user ứng dụng đã tồn tại → thử đăng nhập đúng user/mật khẩu trong .env
+DB_USER="$(env_get DB_USERNAME)"; DB_USER="${DB_USER:-shoe}"
+if ! (cd "$API" && docker compose exec -T mysql mysql -h127.0.0.1 -u"$DB_USER" -p"$DB_ROOT_PASS" "$DB_NAME" -e "select 1" >/dev/null 2>&1); then
+  c_err "MySQL trong Docker từ chối user '$DB_USER' (volume cũ khởi tạo với thông tin khác). Chạy:  ./dev.sh --reset-db"
+  trap - EXIT; exit 1
+fi
 c_ok "MySQL + Redis sẵn sàng"
 
 # 2. API

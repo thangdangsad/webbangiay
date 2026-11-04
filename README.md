@@ -16,7 +16,7 @@ Một lệnh ở thư mục gốc để chạy cả backend và 2 frontend:
 ```bash
 ./dev.sh            # chạy tất cả; Ctrl+C để dừng API + 2 frontend
 ./dev.sh --fresh    # xóa sạch DB rồi migrate + seed lại
-./dev.sh --reset-db # XÓA dữ liệu MySQL (api/data_mysql) rồi tạo lại — dùng khi lỗi 'Access denied for user'
+./dev.sh --reset-db # XÓA dữ liệu MySQL (volume shoe-mysql) rồi tạo lại — dùng khi lỗi 'Access denied for user'
 ./dev.sh --stop     # dừng cả MySQL và Redis (Docker)
 ```
 
@@ -25,7 +25,7 @@ Một lệnh ở thư mục gốc để chạy cả backend và 2 frontend:
 **Script làm gì, theo thứ tự**
 1. Kiểm tra cổng 8000, 3000, 5173 còn trống; nếu bị chiếm thì báo lỗi và dừng (không chạy chồng).
 2. Tạo `api/.env` từ `.env.example` nếu chưa có.
-3. Khởi động MySQL + Redis bằng Docker (dữ liệu MySQL ở `api/data_mysql`) và chờ sẵn sàng.
+3. Khởi động MySQL + Redis bằng Docker (dữ liệu MySQL ở volume Docker `shoe-mysql`) và chờ sẵn sàng.
 4. `composer install` nếu chưa có `vendor`, sinh `APP_KEY`, `storage:link`, `migrate`. Chỉ seed dữ liệu mẫu khi DB còn trống (hoặc khi dùng `--fresh`).
 5. Chạy API `:8000` kèm `queue:work` (gửi email) và `schedule:work` (hủy đơn MoMo quá hạn, đối soát, tổng hợp doanh thu…).
 6. Nếu đã build dữ liệu crawl (`data-migration/build.py`) và DB chưa có sản phẩm thật thì tự nhập `import_products.sql` (xem `data-migration/README.md`). Sản phẩm demo ảnh vẽ chỉ tạo khi `SEED_DEMO_PRODUCTS=true`.
@@ -39,7 +39,7 @@ Một lệnh ở thư mục gốc để chạy cả backend và 2 frontend:
 ## Chạy từng phần thủ công
 
 ```bash
-# 1. Hạ tầng (MySQL lưu ở api/data_mysql, Redis 3 DB: 0 cache · 1 auth · 2 queue)
+# 1. Hạ tầng (MySQL lưu ở volume shoe-mysql, Redis 3 DB: 0 cache · 1 auth · 2 queue)
 cd api && docker compose up -d
 
 # 2. API (cần PHP >= 8.3 + Composer, hoặc chạy qua Sail/Docker)

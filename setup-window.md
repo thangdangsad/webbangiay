@@ -202,7 +202,7 @@ curl -s localhost:8000/up          # sau khi ./dev.sh: API trả 200
 | `bash: ./dev.sh: /bin/bash^M: bad interpreter` | File bị CRLF. Chạy `sed -i 's/\r$//' dev.sh` (hoặc `dos2unix dev.sh`), và đặt `git config --global core.autocrlf input`. |
 | `Cannot connect to the Docker daemon` / `docker: command not found` trong WSL | Mở Docker Desktop và đợi nó chạy xong; kiểm tra bước bật *WSL Integration* cho Ubuntu (Phần 2). |
 | `Cổng 8000/3000/5173 đang bị chiếm` | Tìm tiến trình: PowerShell `netstat -ano \| findstr :8000` rồi `taskkill /PID <pid> /F`; hoặc trong WSL `ss -ltnp \| grep 8000`. Tắt dev server cũ. |
-| `SQLSTATE[HY000] [1045] Access denied for user 'shoe'@'172.20.0.1'` | MySQL chỉ đọc user/mật khẩu ở **lần khởi tạo đầu tiên**. Thư mục `api/data_mysql` cũ (tạo với thông tin khác, hoặc khởi tạo dở do lỗi quyền) khiến `api/.env` không còn khớp. Chạy `./dev.sh --reset-db` (xóa dữ liệu MySQL rồi tạo lại theo `.env`). Chạy thủ công: `cd api`, `docker compose down`, xóa thư mục `data_mysql`, `docker compose up -d mysql redis`. Kiểm tra: `docker compose exec mysql mysql -uroot -ppassword -e "SELECT user,host FROM mysql.user"`. |
+| `SQLSTATE[HY000] [1045] Access denied for user 'shoe'@'172.20.0.1'` | MySQL chỉ đọc user/mật khẩu ở **lần khởi tạo đầu tiên**. Volume `shoe-mysql` cũ (hoặc thư mục `api/data_mysql` của bản trước) (tạo với thông tin khác, hoặc khởi tạo dở do lỗi quyền) khiến `api/.env` không còn khớp. Chạy `./dev.sh --reset-db` (xóa dữ liệu MySQL rồi tạo lại theo `.env`). Chạy thủ công: `cd api`, `docker compose down -v`, `docker compose up -d mysql redis`. Kiểm tra: `docker compose exec mysql mysql -uroot -ppassword -e "SELECT user,host FROM mysql.user"`. |
 | MySQL không lên, báo cổng bận | MySQL của Docker chạy ở cổng **3309** trên máy host (container bên trong vẫn là 3306). Nếu 3309 cũng bị chiếm, đặt cổng khác ở `FORWARD_DB_PORT` **và** `DB_PORT` trong `api/.env`. Tương tự Redis: `FORWARD_REDIS_PORT` + `REDIS_PORT`. |
 | `npm install` rất chậm hoặc lỗi quyền | Dự án đang nằm trong `/mnt/c/...`. Chuyển vào `~/` của WSL. |
 | `EACCES` khi `npm install -g` | Dùng nvm (Phần 4) thay vì cài Node bằng `apt`. |
@@ -228,7 +228,7 @@ docker compose exec mysql mysql -ushoe -ppassword shoe -e "select 1"   # (5) đ�
 | Kết quả | Nguyên nhân | Cách sửa |
 |---|---|---|
 | (5) **chạy được** | Laravel đang nối nhầm tới MySQL khác trên cổng 3309 (container cũ, MySQL khác) | Tắt MySQL đó (`docker rm -f <container cũ>`, hoặc tắt MySQL trong Laragon/XAMPP). Hoặc đổi cổng: trong `api/.env` đặt `FORWARD_DB_PORT` và `DB_PORT` sang số khác, rồi `docker compose up -d mysql`. |
-| (5) **lỗi** và `.env` có ký tự xuống dòng kiểu Windows | `api/.env` bị CRLF nên mật khẩu thành `password\r` | Mở `api/.env` trong VS Code, góc phải dưới đổi `CRLF` → `LF`, lưu; reset DB lại (`docker compose down`, xóa `data_mysql`, `docker compose up -d mysql redis`). |
+| (5) **lỗi** và `.env` có ký tự xuống dòng kiểu Windows | `api/.env` bị CRLF nên mật khẩu thành `password\r` | Mở `api/.env` trong VS Code, góc phải dưới đổi `CRLF` → `LF`, lưu; reset DB lại (`docker compose down -v`, `docker compose up -d mysql redis`). |
 | (5) **lỗi**, log (2) báo lỗi quyền/`chown`/`Can't create` | Thư mục dự án nằm trên ổ NTFS (`C:\...`) không hợp với bind-mount của MySQL | Chuyển dự án vào WSL (`~/webbangiay`) rồi chạy `./dev.sh --reset-db`. |
 | (5) **lỗi** khác | `DB_USERNAME`/`DB_PASSWORD` trong `.env` khác lúc tạo DB | Reset DB như trên sau khi sửa `.env`. |
 
@@ -238,7 +238,7 @@ Nhớ sau khi sửa `.env` chạy `php artisan config:clear` (nếu từng chạ
 
 ```bash
 ./dev.sh --stop                                  # dừng MySQL + Redis
-cd api && docker compose down -v                 # xóa luôn volume Redis (dữ liệu MySQL nằm ở api/data_mysql)
+cd api && docker compose down -v                 # xóa luôn volume Redis (gồm cả volume MySQL `shoe-mysql`)
 docker image rm shoe-php-dev                     # xóa image PHP dev
 docker system prune                              # dọn image/container thừa
 ```
