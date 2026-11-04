@@ -203,7 +203,7 @@ curl -s localhost:8000/up          # sau khi ./dev.sh: API trả 200
 | `Cannot connect to the Docker daemon` / `docker: command not found` trong WSL | Mở Docker Desktop và đợi nó chạy xong; kiểm tra bước bật *WSL Integration* cho Ubuntu (Phần 2). |
 | `Cổng 8000/3000/5173 đang bị chiếm` | Tìm tiến trình: PowerShell `netstat -ano \| findstr :8000` rồi `taskkill /PID <pid> /F`; hoặc trong WSL `ss -ltnp \| grep 8000`. Tắt dev server cũ. |
 | `SQLSTATE[HY000] [1045] Access denied for user 'shoe'@'172.20.0.1'` | MySQL chỉ đọc user/mật khẩu ở **lần khởi tạo đầu tiên**. Thư mục `api/data_mysql` cũ (tạo với thông tin khác, hoặc khởi tạo dở do lỗi quyền) khiến `api/.env` không còn khớp. Chạy `./dev.sh --reset-db` (xóa dữ liệu MySQL rồi tạo lại theo `.env`). Chạy thủ công: `cd api`, `docker compose down`, xóa thư mục `data_mysql`, `docker compose up -d mysql redis`. Kiểm tra: `docker compose exec mysql mysql -uroot -ppassword -e "SELECT user,host FROM mysql.user"`. |
-| MySQL không lên, báo cổng 3306 bận | Máy đang chạy MySQL/XAMPP/Laragon MySQL. Tắt nó, hoặc đặt `FORWARD_DB_PORT=3307` trong `api/.env` **và** `DB_PORT=3307`. Tương tự Redis: `FORWARD_REDIS_PORT` + `REDIS_PORT`. |
+| MySQL không lên, báo cổng bận | MySQL của Docker chạy ở cổng **3309** trên máy host (container bên trong vẫn là 3306). Nếu 3309 cũng bị chiếm, đặt cổng khác ở `FORWARD_DB_PORT` **và** `DB_PORT` trong `api/.env`. Tương tự Redis: `FORWARD_REDIS_PORT` + `REDIS_PORT`. |
 | `npm install` rất chậm hoặc lỗi quyền | Dự án đang nằm trong `/mnt/c/...`. Chuyển vào `~/` của WSL. |
 | `EACCES` khi `npm install -g` | Dùng nvm (Phần 4) thay vì cài Node bằng `apt`. |
 | Build image PHP lỗi mạng | Chạy lại `./dev.sh`; xem `.logs/docker-build.log`. Có proxy công ty thì cấu hình proxy trong Docker Desktop → Settings → Resources → Proxies. |
@@ -211,6 +211,28 @@ curl -s localhost:8000/up          # sau khi ./dev.sh: API trả 200
 | Ảnh sản phẩm không hiện | Chạy `php artisan storage:link` (trong `api/`); với dữ liệu crawl, chạy `data-migration/build.py` để sinh ảnh. |
 | WSL ngốn RAM | Đặt giới hạn trong `.wslconfig` (Phần 1), `wsl --shutdown`. |
 | Đồng hồ lệch sau khi máy ngủ → JWT báo hết hạn | `wsl --shutdown` rồi mở lại WSL (đồng bộ lại giờ). |
+
+
+### Vẫn lỗi `Access denied for user 'shoe'` sau khi reset — chẩn đoán từng bước
+
+Chạy lần lượt trong PowerShell/WSL, thư mục `api/`:
+
+```powershell
+docker compose ps                                   # (1) mysql phải "Up (healthy)", cột PORTS có 0.0.0.0:3309->3306
+docker compose logs mysql --tail 40                 # (2) tìm dòng lỗi khi khởi tạo (permission, chown, "Access denied")
+netstat -ano | findstr :3309                        # (3) có tiến trình KHÁC cùng nghe cổng 3309 không (MySQL của Laragon/XAMPP, container cũ)
+docker ps -a --format "table {{.Names}}\t{{.Ports}}" # (4) có container MySQL cũ (vd của bản Sail) đang giữ cổng 3309 không
+docker compose exec mysql mysql -ushoe -ppassword shoe -e "select 1"   # (5) đăng nhập NGAY TRONG container
+```
+
+| Kết quả | Nguyên nhân | Cách sửa |
+|---|---|---|
+| (5) **chạy được** | Laravel đang nối nhầm tới MySQL khác trên cổng 3309 (container cũ, MySQL khác) | Tắt MySQL đó (`docker rm -f <container cũ>`, hoặc tắt MySQL trong Laragon/XAMPP). Hoặc đổi cổng: trong `api/.env` đặt `FORWARD_DB_PORT` và `DB_PORT` sang số khác, rồi `docker compose up -d mysql`. |
+| (5) **lỗi** và `.env` có ký tự xuống dòng kiểu Windows | `api/.env` bị CRLF nên mật khẩu thành `password\r` | Mở `api/.env` trong VS Code, góc phải dưới đổi `CRLF` → `LF`, lưu; reset DB lại (`docker compose down`, xóa `data_mysql`, `docker compose up -d mysql redis`). |
+| (5) **lỗi**, log (2) báo lỗi quyền/`chown`/`Can't create` | Thư mục dự án nằm trên ổ NTFS (`C:\...`) không hợp với bind-mount của MySQL | Chuyển dự án vào WSL (`~/webbangiay`) rồi chạy `./dev.sh --reset-db`. |
+| (5) **lỗi** khác | `DB_USERNAME`/`DB_PASSWORD` trong `.env` khác lúc tạo DB | Reset DB như trên sau khi sửa `.env`. |
+
+Nhớ sau khi sửa `.env` chạy `php artisan config:clear` (nếu từng chạy `config:cache`).
 
 ## 11. Gỡ cài đặt / dọn dẹp
 
