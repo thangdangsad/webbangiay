@@ -48,7 +48,8 @@ cleanup() {
 trap cleanup INT TERM EXIT
 
 # bắt đầu 1 tiến trình nền trong nhóm riêng, log ra .logs/<tên>.log
-spawn() { local name="$1"; shift; setsid "$@" >"$LOGS/$name.log" 2>&1 & PIDS+=("$!"); }
+if command -v setsid >/dev/null 2>&1; then SETSID=setsid; else SETSID=""; fi  # Git Bash không có setsid
+spawn() { local name="$1"; shift; $SETSID "$@" >"$LOGS/$name.log" 2>&1 & PIDS+=("$!"); }
 
 port_busy() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null && { exec 3>&- 3<&-; return 0; } || return 1; }
 for p in 8000 3000 5173; do port_busy $p && { c_err "Cổng $p đang bị chiếm — hãy tắt tiến trình đang chạy (hoặc ./dev.sh sau khi dừng bản cũ)."; trap - EXIT; exit 1; }; done
