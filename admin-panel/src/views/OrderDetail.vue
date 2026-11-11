@@ -20,7 +20,6 @@
         <div class="card"><h3>Khách hàng</h3><b>{{ o.customer_name }}</b><br />{{ o.phone }}<br /><span class="muted">{{ o.email }}</span>
           <p style="margin-top:8px">{{ addr }}</p><p v-if="o.note" class="muted">Ghi chú: {{ o.note }}</p><router-link v-if="o.user_id && auth.can('customer:read')" class="lnk" :to="`/customers/${o.user_id}`">Xem hồ sơ khách →</router-link></div>
         <div class="card"><h3>Thanh toán</h3><p><span class="pill p-gray">{{ payMethod(o.payment_method) }}</span> <Pill :map="PAY_STATUS" :value="o.payment_status" /></p>
-          <div v-for="p in o.payments" :key="p.id" class="muted" style="font-size:12px;margin-top:6px">{{ p.method.toUpperCase() }} · {{ p.status }} · {{ money(p.amount) }}<template v-if="p.provider_txn_id"> · txn {{ p.provider_txn_id }}</template></div>
           <div v-if="auth.can('payment:manage')" class="acts" style="margin-top:12px;flex-wrap:wrap">
             <button v-if="o.payment_method === 'momo' && o.payment_status !== 'paid'" class="btn sm" @click="momo('query')">Truy vấn MoMo</button>
             <button v-if="o.payment_method === 'momo' && o.payment_status === 'paid'" class="btn sm danger" @click="momo('refund')">Hoàn tiền MoMo</button>
@@ -47,7 +46,7 @@ const idx = (s) => FLOW.indexOf(s)
 const actor = (t) => ({ customer: 'Khách', staff: 'Nhân viên', system: 'Hệ thống' })[t] || t
 const addr = computed(() => { const a = o.value?.ship_address || {}; return [a.street, a.ward_name, a.district_name, a.province_name].filter(Boolean).join(', ') })
 const PERM = { confirmed: 'order:confirm', cancelled: 'order:cancel', packing: 'order:fulfil', shipping: 'order:fulfil', completed: 'order:complete' }
-const LABEL = { confirmed: ['✓ Xác nhận đơn', 'pri'], packing: ['📦 Bắt đầu đóng gói', 'pri'], shipping: ['🚚 Giao cho vận chuyển', 'pri'], completed: ['✔ Hoàn thành', 'pri'], cancelled: ['✕ Hủy đơn', 'danger'] }
+const LABEL = { confirmed: ['✓ Xác nhận đơn hàng', 'pri'], packing: ['📦 Bắt đầu đóng gói', 'pri'], shipping: ['🚚 Giao cho vận chuyển', 'pri'], completed: ['✔ Hoàn thành', 'pri'], cancelled: ['✕ Hủy đơn', 'danger'] }
 const nextActions = computed(() => (o.value?.allowed_next || []).filter((n) => LABEL[n] && auth.can(PERM[n])).map((n) => ({ to: n, label: LABEL[n][0], cls: LABEL[n][1] })))
 function set(d) { o.value = d; note.value = d.internal_note || ''; ship.value = { carrier: d.shipment?.carrier || '', tracking_code: d.shipment?.tracking_code || '' } }
 async function load() { set((await api.get(`/admin/orders/${route.params.id}`)).data.data) }

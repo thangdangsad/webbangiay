@@ -1,6 +1,6 @@
 <template>
   <div v-if="s">
-    <div class="ph"><div><h1>Cài đặt cửa hàng & thanh toán</h1></div><div class="acts"><button class="btn pri" :disabled="busy" @click="save">Lưu thay đổi</button></div></div>
+    <div class="ph"><div><h1>Cài đặt cửa hàng</h1></div><div class="acts"><button class="btn pri" :disabled="busy" @click="save">Lưu thay đổi</button></div></div>
     <div v-if="err" class="errmsg">{{ err }}</div>
     <div class="cols eq">
       <div class="card"><h3>Thông tin cửa hàng</h3>
@@ -14,6 +14,7 @@
         <div class="fld"><label>Hạn mức đơn MoMo (đ) – vượt mức chỉ cho COD</label><input v-model.number="s.payment.momo_max_amount" class="f" type="number" /></div>
         <div class="warnb">MoMo: partnerCode <b>{{ s.momo.partner_code || '—' }}</b> · endpoint {{ s.momo.endpoint }} · chế độ <b>{{ s.momo.fake ? 'GIẢ LẬP (MOMO_FAKE=true)' : 'thật' }}</b>. Khóa bí mật cấu hình trong .env của API, không lưu ở trang này.</div></div>
     </div>
+    <div class="card"><h3>Vận chuyển</h3><div class="g3"><div class="fld"><label>Phí vận chuyển mặc định (đ)</label><input v-model.number="s.shipping.default_fee" class="f" type="number" /></div><div class="fld"><label>Miễn phí vận chuyển từ (đ)</label><input v-model.number="s.shipping.free_threshold" class="f" type="number" /></div><div class="fld"><label>Đơn vị vận chuyển</label><input v-model="s.shipping.carrier" class="f" /></div></div></div>
     <div class="card"><h3>Đơn hàng & đổi trả</h3><div class="g3"><div class="fld"><label>Số ngày cho phép đổi/trả</label><input v-model.number="s.order.return_days" class="f" type="number" /></div><div class="fld"><label>Giữ đơn MoMo chưa thanh toán (phút)</label><input v-model.number="s.order.momo_expire_minutes" class="f" type="number" /></div></div></div>
     <div class="card" v-if="auth.user"><h3>Bảo mật tài khoản của tôi</h3>
       <h4 style="margin-bottom:8px">Phiên đăng nhập</h4>

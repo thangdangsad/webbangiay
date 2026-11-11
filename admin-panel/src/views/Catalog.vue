@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="ph"><div><h1>Danh mục · Thương hiệu · Thuộc tính</h1><p>Quản lý dữ liệu phân loại sản phẩm</p></div></div>
+    <div class="ph"><div><h1>Phân loại sản phẩm</h1><p>Danh mục, thương hiệu và thuộc tính (màu sắc, kích cỡ) dùng khi tạo sản phẩm</p></div></div>
     <div class="card tcard"><div class="tabs"><a v-for="t in tabs" :key="t[0]" :class="{ on: tab === t[0] }" href="#" @click.prevent="tab = t[0]">{{ t[1] }}</a></div>
       <div style="padding:16px">
         <ResourcePage v-if="tab === 'categories'" key="c" embedded endpoint="categories" noun="danh mục" write-perm="product:write" :searchable="false" :params="{ all: 1 }" :columns="[{ key: 'name', label: 'Tên' }, { key: 'parent_id', label: 'Cấp', format: (v) => (v ? 'Con' : 'Gốc') }, { key: 'slug', label: 'Slug' }, { key: 'sort_order', label: 'Thứ tự' }, { key: 'is_active', label: 'Hiển thị', type: 'bool' }]"
@@ -20,7 +20,7 @@
 import { onMounted, ref, computed } from 'vue'
 import api from '../api'
 import ResourcePage from '../components/ResourcePage.vue'
-const tab = ref('categories'); const tabs = [['categories', 'Danh mục'], ['brands', 'Thương hiệu'], ['colors', 'Màu sắc'], ['sizes', 'Size']]
+const tab = ref('categories'); const tabs = [['categories', 'Danh mục'], ['brands', 'Thương hiệu'], ['colors', 'Thuộc tính: Màu sắc'], ['sizes', 'Thuộc tính: Kích cỡ']]
 const cats = ref([])
 const catOptions = computed(() => [[null, '— Gốc —'], ...cats.value.filter((c) => !c.parent_id).map((c) => [c.id, c.name])])
 onMounted(async () => (cats.value = (await api.get('/admin/categories', { params: { all: 1 } })).data.data))

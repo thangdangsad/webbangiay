@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="ph"><div><h1>Phiếu nhập hàng</h1><p>Nhập kho theo SKU, mỗi lần nhập sinh lịch sử biến động</p></div></div>
+    <div class="ph"><div><h1>Nhập kho</h1><p>Nhập hàng theo SKU · mỗi lần nhập được ghi vào lịch sử xuất nhập</p></div></div>
     <div class="cols side">
       <div>
-        <div v-if="auth.can('inventory:write')" class="card"><h3>Tạo phiếu nhập</h3>
+        <div v-if="auth.can('inventory:write')" class="card"><h3>Tạo phiếu nhập kho</h3>
           <div class="g2"><div class="fld"><label>Nhà cung cấp</label><input v-model="f.supplier" class="f" /></div><div class="fld"><label>Ghi chú</label><input v-model="f.note" class="f" /></div></div>
           <div class="fld"><label>Thêm SKU</label><input v-model="search" class="f" placeholder="Gõ SKU hoặc tên sản phẩm..." @input="find" />
             <div v-if="results.length" class="card" style="padding:6px;margin-top:4px"><div v-for="r in results" :key="r.variant_id" style="padding:6px 8px;cursor:pointer" @click="add(r)">{{ r.sku }} · {{ r.product_name }} <small class="muted">({{ r.color }}/{{ r.size }})</small></div></div></div>
@@ -12,7 +12,7 @@
           <div v-if="err" class="errmsg" style="margin-top:10px">{{ err }}</div>
           <button class="btn pri" style="margin-top:12px" :disabled="!f.items.length" @click="submit">Xác nhận nhập kho</button></div>
       </div>
-      <div class="card tcard"><h3 style="padding:16px 16px 0">Phiếu gần đây</h3>
+      <div class="card tcard"><h3 style="padding:16px 16px 0">Phiếu nhập gần đây</h3>
         <table class="tb"><thead><tr><th>Mã</th><th>NCC</th><th class="r">SL</th></tr></thead><tbody><tr v-for="r in receipts" :key="r.id"><td><b>{{ r.code }}</b><small>{{ dt(r.created_at) }}</small></td><td>{{ r.supplier || '—' }}</td><td class="r">{{ r.total_qty }}</td></tr><tr v-if="!receipts.length"><td colspan="3" class="loading">Chưa có phiếu</td></tr></tbody></table></div>
     </div>
   </div>

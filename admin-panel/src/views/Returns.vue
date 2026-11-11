@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="ph"><div><h1>Đổi trả / hoàn tiền</h1><p>requested → approved/rejected → received → refunded</p></div></div>
+    <div class="ph"><div><h1>Đổi trả / hoàn tiền</h1></div></div>
     <div class="card tcard">
       <div class="tabs"><a v-for="t in tabs" :key="t[0]" href="#" :class="{ on: status === t[0] }" @click.prevent="status = t[0]; load()">{{ t[1] }}</a></div>
       <div v-if="loading" class="loading">Đang tải...</div>

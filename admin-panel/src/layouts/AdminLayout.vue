@@ -31,22 +31,17 @@ const q = ref('')
 const badge = reactive({})
 
 const MENU = [
-  { title: 'Tổng quan', items: [{ to: '/dashboard', label: '📊 Dashboard', perm: ['dashboard:read'] }] },
+  { title: 'Tổng quan', items: [{ to: '/dashboard', label: '📊 Bảng điều khiển', perm: ['dashboard:read'] }] },
   { title: 'Bán hàng', items: [
-    { to: '/orders', label: '🧾 Đơn hàng', perm: ['order:read'] }, { to: '/returns', label: '↩️ Đổi trả / hoàn tiền', perm: ['return:read'] },
-    { to: '/customers', label: '👥 Khách hàng', perm: ['customer:read'] }, { to: '/reviews', label: '⭐ Đánh giá sản phẩm', perm: ['content:manage'] } ] },
-  { title: 'Sản phẩm', items: [{ to: '/products', label: '👟 Sản phẩm', perm: ['product:read'] }, { to: '/catalog', label: '🗂️ Danh mục · Thương hiệu · Thuộc tính', perm: ['product:read'] }] },
+    { to: '/orders', label: '🧾 Đơn hàng', perm: ['order:read'] },
+    { to: '/customers', label: '👥 Khách hàng', perm: ['customer:read'] } ] },
+  { title: 'Sản phẩm', items: [{ to: '/products', label: '👟 Danh sách sản phẩm', perm: ['product:read'] }, { to: '/catalog', label: '🗂️ Phân loại sản phẩm', perm: ['product:read'] }, { to: '/reviews', label: '⭐ Đánh giá của khách', perm: ['content:manage'] }] },
   { title: 'Kho hàng', items: [
-    { to: '/inventory', label: '📦 Tồn kho', perm: ['inventory:read'] }, { to: '/inventory/receipts', label: '📥 Phiếu nhập hàng', perm: ['inventory:read'] },
-    { to: '/inventory/movements', label: '🔁 Lịch sử biến động', perm: ['inventory:read'] } ] },
-  { title: 'Marketing', items: [
-    { to: '/marketing/coupons', label: '🎟️ Mã giảm giá', perm: ['marketing:manage'] }, { to: '/marketing/promotions', label: '⚡ Khuyến mãi / Flash sale', perm: ['marketing:manage'] },
-    { to: '/marketing/banners', label: '🖼️ Banner', perm: ['marketing:manage'] } ] },
-  { title: 'Báo cáo', items: [{ to: '/reports', label: '📈 Báo cáo', perm: ['report:read'] }] },
-  { title: 'Nội dung', items: [{ to: '/cms', label: '📝 Trang nội dung', perm: ['content:manage'] }] },
+    { to: '/inventory', label: '📦 Tồn kho & nhập kho', perm: ['inventory:read'] } ] },
+  { title: 'Marketing', items: [{ to: '/marketing/coupons', label: '🎟️ Mã giảm giá', perm: ['marketing:manage'] }] },
   { title: 'Cài đặt', items: [
-    { to: '/settings', label: '⚙️ Cửa hàng & thanh toán', perm: ['settings:manage'] }, { to: '/settings/shipping', label: '🚚 Vận chuyển', perm: ['settings:manage'] },
-    { to: '/settings/staff', label: '🔐 Nhân viên & phân quyền', perm: ['staff:manage'] }, { to: '/settings/audit-log', label: '🕘 Nhật ký hoạt động', perm: ['audit:read'] } ] },
+    { to: '/settings', label: '⚙️ Cài đặt cửa hàng', perm: ['settings:manage'] },
+    { to: '/settings/staff', label: '🔐 Nhân viên', perm: ['staff:manage'] } ] },
 ]
 const visible = computed(() => MENU.map((g) => ({ ...g, items: g.items.filter((i) => auth.canAny(i.perm)) })).filter((g) => g.items.length))
 const isOn = (to) => route.path === to || (to !== '/dashboard' && route.path.startsWith(to + '/') && !MENU.flatMap((g) => g.items).some((i) => i.to !== to && i.to.startsWith(to + '/') && route.path.startsWith(i.to)))
